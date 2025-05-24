@@ -1,33 +1,24 @@
 'use client';
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from 'next-auth/react';
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
 
 export default function HomeClient() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === 'loading') return <p>Carregando...</p>;
 
   return (
-    <main className="p-8">
+     <div>
       {session ? (
         <>
-          <p>Bem-vindo, {session.user?.name}!</p>
-          <button
-            onClick={() => signOut()}
-            className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Sair
-          </button>
+          <p>Bem-vindo, {session.user?.name}</p>
+          <LogoutButton />
         </>
       ) : (
-        <>
-          <p>Você não está logado.</p>
-          <button
-            onClick={() => signIn("github")}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Entrar com GitHub
-          </button>
-        </>
+        <LoginButton />
       )}
-    </main>
+    </div>
   );
 }
