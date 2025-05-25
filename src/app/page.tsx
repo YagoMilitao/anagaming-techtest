@@ -6,6 +6,7 @@ import OddsList from "./components/Odds/OddsList";
 import { fetchOddsData } from "./lib/fetchOdds";
 import UserPanel from "./components/UserPanel";
 import FilterBar from "./components/FilterBar";
+import OddsFilter from "./components/Odds/OddsFilter";
 
 
 export default async function HomePage() {
@@ -27,6 +28,7 @@ export default async function HomePage() {
         Apostas ao Vivo
       </h1>
       <FilterBar sports={sports} />
+      <OddsFilter />
       <OddsList odds={odds} />
     </main>
   );
