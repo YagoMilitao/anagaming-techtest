@@ -64,18 +64,18 @@ export default function OddsList({ odds }: Props) {
             <span className="text-xs text-gray-400"> Início:{formatDate(odd.commence_time)}</span>
             
           </div>
-          <h2 className="text-lg font-semibold">
-            {odd.teams && odd.teams.length >= 2
-              ? `${odd.teams[0]} vs ${odd.teams[1]}`
-              : odd.home_team
-              ? `${odd.home_team} vs ${odd.home_team}`
-              : 'Times não definidos'}
-          </h2>
-          <div className="mt-2">
-            {odd.sites?.slice(0, 2).map((site) => (
-              <div key={site.site_key} className="text-sm text-gray-700">
-                <strong>{site.site_nice}:</strong>{' '}
-                {site.odds?.h2h?.join(' | ') || 'Sem odds disponíveis'}
+            <h2 className="text-lg font-semibold">
+              {odd.home_team && odd.away_team
+                ? `${odd.home_team} vs ${odd.away_team}`
+                : 'Times não definidos'}
+            </h2>
+            <div className="mt-2">
+              {odd.sites?.slice(0, 2).map((site) => (
+                <div key={site.site_key} className="text-sm text-gray-700">
+                  <strong>{site.site_nice}:</strong>{' '}
+                  {Array.isArray(site.odds?.h2h)
+                    ? site.odds.h2h.join(' | ')
+                    : 'Sem odds disponíveis'}
               </div>
             ))}
           </div>
