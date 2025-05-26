@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchOddsData } from "../lib/fetchOdds";
 import { useOddsContext } from "../context/OddsContext";
 import UserPanel from "./UserPanel";
@@ -9,20 +9,18 @@ import FilterBar from "./FilterBar";
 import OddsFilter from "./Odds/OddsFilter";
 import DropdownAccordion from "./DropdownAccordion";
 import { orderBy } from "lodash";
+import StatusDot from "./StatusDot";
 
 export default function ClientHomePage({ session }: { session: any }) {
   const [loading, setLoading] = useState(true);
   const [odds, setOdds] = useState<any[]>([]);
 
-  const context = useOddsContext();
-  
   const {
     selectedSport,
     setSelectedSport,
     favoriteSports,
     toggleFavoriteSport,
-  } = context;
-
+  } = useOddsContext();
 
   useEffect(() => {
     async function loadOdds() {
@@ -33,27 +31,21 @@ export default function ClientHomePage({ session }: { session: any }) {
     loadOdds();
   }, []);
 
-  if (loading) return <div className="p-6">Carregando...</div>;
+  if (loading) return <div className="p-6">Carregando...</div>
 
-  // Filtrar odds por esporte selecionado, se houver
-  // Se não houver selectedSport, filtrar por favoritos (se houver)
-  // Se não houver nenhum filtro, mostrar todos
-  const filteredOdds = useMemo(() => {
-    if (selectedSport) {
-      return odds.filter((odd) => odd.sport_title === selectedSport);
-    }
-    if (favoriteSports.length > 0) {
-      return odds.filter((odd) => favoriteSports.includes(odd.sport_title));
-    }
-    return odds;
-  }, [odds, selectedSport, favoriteSports]);
+  
 
-  const now = Date.now();
+  // Filtrar odds pelo esporte selecionado (se houver)
+  const filteredOdds = selectedSport
+    ? odds.filter((odd) => odd.sport_title === selectedSport)
+    : odds;
+
+  const now = Date.now()
 
   // Separar os jogos
   const liveGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime();
-    // Jogo ao vivo se começou e não passou mais que 3 horas
+    // Considera jogo ao vivo se começou e não passou mais que 3 horas (ajuste conforme duração média)
     return start <= now && now <= start + 3 * 60 * 60 * 1000;
   });
 
@@ -64,17 +56,21 @@ export default function ClientHomePage({ session }: { session: any }) {
 
   const finishedGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime();
-    return start + 3 * 60 * 60 * 1000 < now;
+    return start + 3 * 60 * 60 * 1000 < now; // já passou do limite de duração
   });
 
-  // Ordenações
-  const sortByCommenceTimeAsc = (games: any[]) =>
+  function sortByCommenceTimeAsc(games: any[]) {
+    return [...games].sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
+  }
+
+  function sortByCommenceTimeDesc(games: any[]) {
+    return [...games].sort((a, b) => new Date(b.commence_time).getTime() - new Date(a.commence_time).getTime());
+  }
+
+  // Ordenar cada lista pela data (mais próxima primeiro)
+  const sortByCommenceTime = (games: any[]) =>
     orderBy(games, [(g) => new Date(g.commence_time).getTime()], ['asc']);
 
-  const sortByCommenceTimeDesc = (games: any[]) =>
-    orderBy(games, [(g) => new Date(g.commence_time).getTime()], ['desc']);
-
-  // Ordenar ao vivo e futuros ascendente, encerrados descendente
   const sortedLiveGames = sortByCommenceTimeAsc(liveGames);
   const sortedFutureGames = sortByCommenceTimeAsc(futureGames);
   const sortedFinishedGames = sortByCommenceTimeDesc(finishedGames);
@@ -82,7 +78,6 @@ export default function ClientHomePage({ session }: { session: any }) {
   return (
     <main className="p-6 max-w-5xl mx-auto">
       <UserPanel session={session} />
-
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Apostas ao Vivo</h1>
 
@@ -127,7 +122,7 @@ export default function ClientHomePage({ session }: { session: any }) {
         {/* Botão para limpar selectedSport */}
         {selectedSport && (
           <button
-            onClick={() => setSelectedSport("")}
+            onClick={() => setSelectedSport("")}	
             className="ml-4 px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
           >
             Limpar filtro de esporte
@@ -139,7 +134,12 @@ export default function ClientHomePage({ session }: { session: any }) {
       <OddsFilter />
 
       <DropdownAccordion
-        title="Jogos Ao Vivo"
+        title={
+          <div className="flex items-center gap-2">
+            
+            <span>Jogos Ao Vivo</span>
+          </div>
+        }
         defaultOpen
         count={sortedLiveGames.length}
         status="live"
@@ -148,7 +148,12 @@ export default function ClientHomePage({ session }: { session: any }) {
       </DropdownAccordion>
 
       <DropdownAccordion
-        title="Jogos Futuros"
+        title={
+          <div className="flex items-center gap-2">
+           
+            <span>Jogos Futuros</span>
+          </div>
+        }
         defaultOpen
         count={sortedFutureGames.length}
         status="future"
@@ -157,7 +162,12 @@ export default function ClientHomePage({ session }: { session: any }) {
       </DropdownAccordion>
 
       <DropdownAccordion
-        title="Jogos Encerrados"
+        title={
+         <div className="flex items-center gap-2">
+           
+           <span>Jogos Encerrados</span>
+         </div>
+        }
         count={sortedFinishedGames.length}
         status="finished"
       >

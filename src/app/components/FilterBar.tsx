@@ -12,7 +12,7 @@ export default function FilterBar({ sports }: { sports: string[] }) {
         onChange={(e) => setSelectedSport(e.target.value)}
         className="border p-2 rounded"
       >
-        <option value="">Todos os eselectedSportes</option>
+        <option value="">Todos os esportes</option>
         {sports.map((s) => (
           <option key={s} value={s}>
             {s}

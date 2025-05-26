@@ -4,7 +4,7 @@ import { useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DropdownAccordionProps {
-  title: string;
+  title: ReactNode;
   defaultOpen?: boolean;
   children: ReactNode;
   count?: number;
@@ -28,23 +28,27 @@ export default function DropdownAccordion({ title, defaultOpen = false, children
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2 font-semibold text-lg">
-          {title}
-          {status === 'live' && (
+           {status === 'live' && (
             <motion.span
               className={`w-4 h-4 rounded-full ${statusColors[status]}`}
               animate={{ scale: [1, 1.4, 1] }}
               transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
               aria-label="Indicador de jogos ao vivo pulsante"
             />
-          )}
-          {(status === 'future' || status === 'finished') && (
+            )}
+            {(status === 'future' || status === 'finished') && (
             <span
               className={`w-4 h-4 rounded-full ${statusColors[status]}`}
               aria-label={`Indicador de jogos ${status}`}
             />
-          )}
-          {count !== undefined && <span className="text-gray-600">({count})</span>}
-        </div>
+            )}
+            <span>{title}</span>
+            {count !== undefined && 
+              <span className="text-gray-600">
+                ({count})
+                </span>
+            }
+          </div>
         <svg
           className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
           fill="none"
