@@ -4,7 +4,6 @@ import { useOddsContext } from "@/app/context/OddsContext";
 
 
 const sports = ['soccer', 'basketball', 'tennis', 'mma', 'baseball'];
-
 export default function OddsFilter() {
   const { selectedSport, setSelectedSport } = useOddsContext();
 
@@ -17,9 +16,9 @@ export default function OddsFilter() {
         onChange={(e) => setSelectedSport(e.target.value)}
       >
         <option value="">Todos</option>
-        {sports.map((sport) => (
-          <option key={sport} value={sport}>
-            {sport.toUpperCase()}
+        {sports.map((selectedSport) => (
+          <option key={selectedSport} value={selectedSport}>
+            {selectedSport.toUpperCase()}
           </option>
         ))}
       </select>

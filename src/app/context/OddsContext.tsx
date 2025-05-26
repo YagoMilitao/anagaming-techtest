@@ -1,9 +1,8 @@
 'use client';
-import { createContext, useContext, useState, ReactNode } from 'react';
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type OddsContextType = {
-  sport: string;
-  setSport: (value: string) => void;
   sortBy: string;
   setSortBy: (value: string) => void;
   selectedSport: string;
@@ -15,37 +14,44 @@ type OddsContextType = {
 const OddsContext = createContext<OddsContextType | undefined>(undefined);
 
 export const OddsProvider = ({ children }: { children: ReactNode }) => {
-  const [sport, setSport] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
-  /*const [favoriteSports, setFavoriteSports] = useState<string[]>([]);
-  // Function to toggle a sport in the favorites list
-  const toggleFavoriteSport = (sport: string) => {
-    setFavoriteSports((prev) =>
-      prev.includes(sport)
-        ? prev.filter((s) => s !== sport)
-        : [...prev, sport]
-    );
-  };*/
-  const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
-  if (typeof window !== 'undefined') {
-    return JSON.parse(localStorage.getItem('favoriteSports') || '[]');
-  }
-  return [];
-});
 
-const toggleFavoriteSport = (sport: string) => {
-  setFavoriteSports(prev => {
-    const updated = prev.includes(sport)
-      ? prev.filter(s => s !== sport)
-      : [...prev, sport];
-    localStorage.setItem('favoriteSports', JSON.stringify(updated));
-    return updated;
+  const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('favoriteSports');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
-};
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('favoriteSports', JSON.stringify(favoriteSports));
+    }
+  }, [favoriteSports]);
+
+  const toggleFavoriteSport = (sport: string) => {
+    setFavoriteSports(prev =>
+      prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport]
+    );
+  };
 
   return (
-    <OddsContext.Provider value={{ sport, setSport, sortBy, setSortBy, selectedSport, setSelectedSport, favoriteSports, toggleFavoriteSport }}>
+    <OddsContext.Provider
+      value={{
+        sortBy,
+        setSortBy,
+        selectedSport,
+        setSelectedSport,
+        favoriteSports,
+        toggleFavoriteSport,
+      }}
+    >
       {children}
     </OddsContext.Provider>
   );

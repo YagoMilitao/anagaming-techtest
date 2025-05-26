@@ -1,7 +1,9 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+
 export async function fetchOddsData() {
    try {
     const apiKey = process.env.NEXT_PUBLIC_ODDS_API_KEY
-    console.log("API Key:", apiKey); // Log para depuração
     if (!apiKey) {
       throw new Error("API key não definida. Verifique suas variáveis de ambiente.");
     }
@@ -33,3 +35,18 @@ export async function fetchSports() {
   if (!res.ok) throw new Error('Erro ao buscar odds');
   return res.json();
 }
+
+export const fetchFavorites = async (email: string) => {
+  const res = await fetch(`${process.env.API_URL}/favorites?email=${email}`);
+  if (!res.ok) throw new Error('Erro ao buscar favoritos');
+  return res.json();
+}
+
+export const saveFavorite = async (sport: string) => {
+  const res = await fetch(`${process.env.API_URL}/favorites`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sport }),
+  });
+  return res.json();
+};

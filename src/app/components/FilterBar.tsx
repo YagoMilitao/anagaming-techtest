@@ -1,21 +1,22 @@
 'use client';
 
-import { useOddsContext } from "../context/OddsContext";
-
+import { useOddsContext } from '@/app/context/OddsContext';
 
 export default function FilterBar({ sports }: { sports: string[] }) {
-  const { sport, setSport, sortBy, setSortBy  } = useOddsContext();
+  const { selectedSport, setSelectedSport, sortBy, setSortBy } = useOddsContext();
 
   return (
     <div className="flex gap-4 mb-6 flex-wrap">
       <select
-        value={sport}
-        onChange={(e) => setSport(e.target.value)}
+        value={selectedSport}
+        onChange={(e) => setSelectedSport(e.target.value)}
         className="border p-2 rounded"
       >
-        <option value="">Todos os esportes</option>
+        <option value="">Todos os eselectedSportes</option>
         {sports.map((s) => (
-          <option key={s} value={s}>{s}</option>
+          <option key={s} value={s}>
+            {s}
+          </option>
         ))}
       </select>
 

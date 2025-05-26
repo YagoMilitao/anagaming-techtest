@@ -1,93 +1,106 @@
 'use client';
 
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-import { useEffect, useState } from 'react';
-import { formatDate } from '@/utils/formatDate';
-import _ from 'lodash';
-import { useOddsContext } from '@/app/context/OddsContext';
-
-type Site = {
-  site_key: string;
-  site_nice: string;
-  odds: {
-    h2h?: number[];
-    spreads?: { points: number[]; odds: number[] };
-    totals?: { points: number[]; odds: number[] };
-  };
-  last_update: string;
-};
-
-type OddsData = {
+type Odd = {
   id: string;
-  sport_key: string;
   sport_title: string;
-  teams?: string[];
   commence_time: string;
   home_team: string;
-  sites: Site[];
   away_team: string;
-  odd_price: number;
+  bookmakers: {
+    key: string;
+    markets: {
+      outcomes: {
+        name: string;
+        price: number;
+      }[];
+    }[];
+  }[];
 };
 
-type Props = {
-  odds: OddsData[];
+type OddsListProps = {
+  odds: Odd[];
 };
 
-export default function OddsList({ odds }: Props) {
-  const { selectedSport, sortBy } = useOddsContext();
-  const [filteredOdds, setFilteredOdds] = useState<OddsData[]>([]);
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
 
-  useEffect(() => {
-    let result = odds;
+function formatDateTime(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleString(undefined, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
-    if (selectedSport) {
-      result = result.filter((odd) => odd.sport_key === selectedSport);
-    }
-
-    if (sortBy === 'date') {
-      result = _.orderBy(result, ['commence_time'], ['asc']);
-    }
-
-    setFilteredOdds(result);
-  }, [odds, selectedSport, sortBy]);
-
-  if (!filteredOdds.length) {
-    return <p className="text-center text-gray-500 mt-8">Nenhum jogo encontrado.</p>;
-  }
+export default function OddsList({ odds }: OddsListProps) {
+  // Função para encontrar a maior odd (preço) dentre os outcomes
+  const getBestOdd = (bookmakers: Odd['bookmakers']) => {
+    let bestPrice = 0;
+    bookmakers.forEach((bookmaker) => {
+      bookmaker.markets.forEach((market) => {
+        market.outcomes.forEach((outcome) => {
+          if (outcome.price > bestPrice) bestPrice = outcome.price;
+        });
+      });
+    });
+    return bestPrice;
+  };
 
   return (
-    <div className="grid gap-4 mt-6">
-      {filteredOdds.map((odd) => (
-        <div key={odd.id} className="bg-white rounded-xl p-4 shadow mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-500">{odd.sport_title}</span>
-            <span className="text-xs text-gray-400"> Início:{formatDate(odd.commence_time)}</span>
-            
-          </div>
-            <h2 className="text-lg font-semibold">
-              {odd.home_team && odd.away_team
-                ? `${odd.home_team} vs ${odd.away_team}`
-                : 'Times não definidos'}
-            </h2>
-            <div className="mt-2">
-              {odd.sites?.slice(0, 2).map((site) => (
-                <div key={site.site_key} className="text-sm text-gray-700">
-                  <strong>{site.site_nice}:</strong>{' '}
-                  {Array.isArray(site.odds?.h2h)
-                    ? site.odds.h2h.join(' | ')
-                    : 'Sem odds disponíveis'}
+    <ul className="space-y-4 mt-3">
+      <AnimatePresence>
+        {odds.map((odd) => {
+          const bestOdd = getBestOdd(odd.bookmakers);
+          return (
+            <motion.li
+              key={odd.id}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              layout
+              className="bg-white rounded-md shadow-md p-4 hover:shadow-lg transition-shadow duration-300"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-semibold text-lg">
+                  {odd.home_team} vs {odd.away_team}
+                </h3>
+                <span className="text-sm text-gray-500">{formatDateTime(odd.commence_time)}</span>
               </div>
-            ))}
-          </div>
-          <div
-            key={odd.id}
-            className="p-2 bg-green-100 text-green-800 rounded shadow"
-          >
-            <span className="font-semibold">{odd.home_team}</span>: {odd.odd_price}
-            <span className="font-semibold">{odd.away_team}</span>: {odd.odd_price}
-          </div>
-        </div>
-      ))}
-    </div>
+    
+              <ul className="flex gap-4 flex-wrap">
+                {odd.bookmakers.map((bookmaker) =>
+                  bookmaker.markets.map((market, mIndex) =>
+                    market.outcomes.map((outcome, oIndex) => {
+                      const isBest = outcome.price === bestOdd;
+                      return (
+                        <li
+                          key={`${bookmaker.key}-${mIndex}-${oIndex}`}
+                          className={`px-3 py-1 rounded cursor-pointer select-none transition-colors duration-200
+                            ${isBest ? 'bg-green-500 text-white font-bold shadow-md' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
+                          `}
+                          title={`${outcome.name} - Odd: ${outcome.price}`}
+                        >
+                          {outcome.name}: {outcome.price.toFixed(2)}
+                        </li>
+                      );
+                    })
+                  )
+                )}
+              </ul>
+            </motion.li>
+          );
+        })}
+      </AnimatePresence>
+    </ul>
   );
 }
