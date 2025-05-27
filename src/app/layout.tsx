@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import { OddsProvider } from "./context/OddsContext";
+import { FilterProvider } from './context/FilterContext';
 
 // export const metadata = {
 //   title: 'Ana Gaming Techtest',
@@ -44,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                <Link href="/api/auth/signout">Logout</Link>
              </nav>
            </header>
-          {children}
+           {children}
         </OddsProvider>
       </body>
     </html>

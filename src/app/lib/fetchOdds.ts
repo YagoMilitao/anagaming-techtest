@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { OddData } from "../components/Odds/OddDetails";
 
 export async function fetchOddsData() {
    try {
@@ -23,11 +24,42 @@ export async function fetchOddsData() {
     throw error;
   }
 }
+export async function fetchOddById(sport: string, eventId: string): Promise<OddData | null> {
+  
+  const apiUrl = `https://api.the-odds-api.com/v4/sports/${sport}/events/${eventId}?apiKey=${process.env.ODDS_API_KEY}`;
 
-export async function fetchOddsById(id: string) {
-  const all = await fetchOddsData();
-  return all.find((game: any) => game.id === id);
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      const message = `Erro ao buscar evento com ID ${eventId} para o esporte ${sport}: ${response.status}`;
+      throw new Error(message);
+    }
+    const data = await response.json();
+
+    // A resposta da API para um evento específico conterá detalhes sobre esse evento,
+    // incluindo os bookmakers e suas odds. Você precisará adaptar sua interface
+    // `OddData` para corresponder à estrutura da resposta da The Odds API.
+
+    // Pode ser necessário extrair as informações relevantes e formatá-las
+    // para corresponder à sua interface `OddData`.
+
+    console.log("Dados da API:", data); // Para entender a estrutura da resposta
+    return data as any; // Adapte o tipo conforme a resposta da API
+  } catch (error: any) {
+    console.error(`Erro ao buscar detalhes do evento ${eventId} para o esporte ${sport}:`, error);
+    return null;
+  }
 }
+// export async function fetchOddById(oddId: string): Promise<OddData> {
+//   const response = await fetch(`/api/odds/${oddId}`); // Substitua pela URL correta da sua API
+//   if (!response.ok) {
+//     const message = `Erro ao buscar odd com ID ${oddId}: ${response.status}`;
+//     throw new Error(message);
+//   }
+//   const data = await response.json();
+//   return data as OddData;
+// }
+
 export async function fetchSports() {
   const url = `https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.ODDS_API_KEY}`;
   const res = await fetch(url, { cache: 'no-store' });
@@ -41,6 +73,8 @@ export const fetchFavorites = async (email: string) => {
   if (!res.ok) throw new Error('Erro ao buscar favoritos');
   return res.json();
 }
+
+
 
 export const saveFavorite = async (sport: string) => {
   const res = await fetch(`${process.env.API_URL}/favorites`, {

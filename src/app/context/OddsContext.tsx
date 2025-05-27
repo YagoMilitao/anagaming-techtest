@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type OddsContextType = {
+  selectedChampionship: string;
+  setSelectedChampionship: (championship: string) => void;
   sortBy: string;
   setSortBy: (value: string) => void;
   selectedSport: string;
@@ -16,6 +18,7 @@ const OddsContext = createContext<OddsContextType | undefined>(undefined);
 export const OddsProvider = ({ children }: { children: ReactNode }) => {
   const [sortBy, setSortBy] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
+  const [selectedChampionship, setSelectedChampionship] = useState("");
 
   const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -44,6 +47,8 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <OddsContext.Provider
       value={{
+        selectedChampionship,
+        setSelectedChampionship,
         sortBy,
         setSortBy,
         selectedSport,
