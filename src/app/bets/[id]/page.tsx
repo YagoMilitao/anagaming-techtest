@@ -48,7 +48,7 @@ export default function OddDetailPage() {
   }
 
   if (!odd) {
-    return <div className="p-6">Odd não encontrada.</div>;
+    return <div className="p-6">Odd não encontrada..</div>;
   }
 
   return (

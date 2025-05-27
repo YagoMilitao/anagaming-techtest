@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { fetchOddsData } from "@/app/lib/fetchOdds";
-import OddDetails from "../OddDetails";
+import OddDetails from "@/app/sports/[sport]/[id]/page";
+
 
 
 export default async function OddsDetailPage({ params }: { params: { id: string } }) {
@@ -17,8 +18,8 @@ export default async function OddsDetailPage({ params }: { params: { id: string 
   const odd = odds.find((o: any) => o.id === params.id);
 
   if (!odd) {
-    return <div className="p-6">Odd não encontrada.</div>;
+    return <div className="p-6">Odd não encontrada...</div>;
   }
 
-  return <OddDetails odd={odd} />;
+  return <OddDetails  />;
 }

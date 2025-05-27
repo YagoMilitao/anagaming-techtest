@@ -3,19 +3,23 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { fetchOddById } from '@/app/lib/fetchOdds';
+import { useRouter } from 'next/navigation';
 
-interface Outcome {
+
+export interface Outcome {
   name: string;
   price: number | string;
+  point?: number;
   [key: string]: any;
 }
 
-interface Market {
+export interface Market {
+  key: string;
   outcomes: Outcome[];
   [key: string]: any;
 }
 
-interface Bookmaker {
+export interface Bookmaker {
   key: string;
   title: string;
   markets: Market[];
@@ -25,44 +29,53 @@ interface Bookmaker {
 export interface OddData {
   id: string;
   sport_title: string;
+  
   commence_time: string;
   home_team: string;
   away_team: string;
   bookmakers: Bookmaker[];
   eventId: string;
   sport: string;
-  status: 'live' | 'future' | 'finished';
+  status: 'live' | 'future' | 'finished' | string;
+  league_name?: string;
+  sport_key: string;
   [key: string]: any;
 }
 
-interface OddDetailsProps {
-    odd: any;
-}
 
-export default function OddDetails(props: OddDetailsProps) {
+export default function Page() {
   const params = useParams();
   const oddId = params?.id as string;
   const sport = params?.sport as string;
-  const eventId = params?.eventId as string;
   const [odd, setOdd] = useState<OddData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
 
   useEffect(() => {
     async function loadOdd() {
-      if (!oddId) return;
-      try {
-        const data = await fetchOddById(sport,oddId)
-        setOdd(data);
+     try {
+    const data = await fetchOddById(sport, oddId);
+    console.log("Dados recebidos de fetchOddById:", data);
+    if (!data) {
+        console.error("fetchOddById retornou nulo."); // <-- ADICIONE ESTE LOG
+        setError("Não foi possível encontrar os detalhes do evento.");
         setLoading(false);
-      } catch (err: any) {
-        setError(err.message || 'Erro ao carregar detalhes da odd.');
-        setLoading(false);
-        console.error(err);
-      }
+        return;
     }
-    loadOdd();
-  }, [oddId]);
+    setOdd(data);
+    setLoading(false);
+} catch (err: any) {
+    console.error("Erro na chamada fetchOddById:", err); // <-- ADICIONE ESTE LOG
+    setError(err.message || 'Erro ao carregar detalhes da odd.');
+    setLoading(false);
+    console.error(err);
+}
+  } 
+    loadOdd()
+  }, [oddId, sport]);
+
+
 
   if (loading) return <div className="p-6">Carregando detalhes da odd...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
@@ -80,22 +93,26 @@ export default function OddDetails(props: OddDetailsProps) {
         <strong>Esporte:</strong> {odd.sport_title}
       </p>
       <p className="text-gray-600 mb-2">
-        <strong>Data:</strong> {new Date(odd.commence_time).toLocaleString()}
+        <strong>Data:</strong> {commenceDate.toLocaleString()}
       </p>
-      <p className="text-gray-600 mb-4">
-        <strong>Campeonato:</strong> {odd.league_name}
-      </p>
+      {odd.league_name && (
+        <p className="text-gray-600 mb-4">
+          <strong>Campeonato:</strong> {odd.league_name}
+        </p>
+      )}
 
       <div>
-        <h2 className="text-xl font-semibold mb-2">Odds disponíveis:</h2>
-        {odd.bookmakers.map((bookmaker: any) => (
+        <h2 className="text-xl font-semibold mb-2">Odds disponíveis por casa de aposta:</h2>
+        {odd.bookmakers?.map((bookmaker) => (
           <div key={bookmaker.key} className="mb-4 border p-4 rounded shadow">
             <h3 className="text-lg font-bold mb-2">{bookmaker.title}</h3>
-            {bookmaker.markets.map((market: any, idx: number) => (
-              <div key={idx}>
-                {market.outcomes.map((outcome: any) => (
+            {bookmaker.markets?.map((market) => (
+              <div key={market.key} className="mb-2">
+                <h4 className="text-md font-semibold mb-1">{market.key}</h4>
+                {market.outcomes?.map((outcome) => (
                   <p key={outcome.name}>
                     {outcome.name}: <strong>{outcome.price}</strong>
+                    {outcome.point !== undefined && ` (Ponto: ${outcome.point})`}
                   </p>
                 ))}
               </div>
@@ -106,13 +123,3 @@ export default function OddDetails(props: OddDetailsProps) {
     </main>
   );
 }
-
-// async function fetchOddById(oddId: string): Promise<OddData> {
-//   const response = await fetch(`/api/odds/${oddId}`);
-//   if (!response.ok) {
-//     const message = `Erro ao buscar odd com ID ${oddId}: ${response.status}`;
-//     throw new Error(message);
-//   }
-//   const data = await response.json();
-//   return data as OddData;
-// }
