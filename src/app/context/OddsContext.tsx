@@ -13,6 +13,8 @@ type OddsContextType = {
   setSortBy: (value: string) => void;
   favoriteSports: string[];
   toggleFavoriteSport: (sport: string) => void;
+  allSports: { group: string; keys: string[] }[];
+  setAllSports: (sports: { group: string; keys: string[] }[]) => void;
 };
 
 const OddsContext = createContext<OddsContextType | undefined>(undefined);
@@ -21,6 +23,8 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
   const [sortBy, setSortBy] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
   const [selectedChampionship, setSelectedChampionship] = useState('');
+  const [allSports, setAllSports] = useState<{ group: string, keys: string[] }[]>([]);
+
 
   const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -56,6 +60,32 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
     setSelectedSport('');
   };
 
+  async function loadSports() {
+  try {
+    const res = await fetch(`https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}`);
+    const data = await res.json();
+
+    // Agrupar por group
+    const grouped: { [group: string]: string[] } = {};
+    data.forEach((sport: any) => {
+      if (!grouped[sport.group]) grouped[sport.group] = [];
+      grouped[sport.group].push(sport.key);
+    });
+
+    // Transformar em array
+    const uniqueGroups = Object.entries(grouped).map(([group, keys]) => ({ group, keys }));
+
+    setAllSports(uniqueGroups);
+  } catch (error) {
+    console.error('Erro ao buscar esportes:', error);
+  }
+}
+useEffect(() => {
+  loadSports();
+}, []);
+
+
+
   return (
     <OddsContext.Provider
       value={{
@@ -69,6 +99,9 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
         setSortBy,
         favoriteSports,
         toggleFavoriteSport,
+        allSports,
+        setAllSports
+ 
       }}
     >
       {children}

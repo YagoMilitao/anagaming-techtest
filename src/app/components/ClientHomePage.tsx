@@ -11,6 +11,7 @@ import DropdownAccordion from "./DropdownAccordion";
 import { orderBy } from "lodash";
 import StatusDot from "./StatusDot";
 import ChampionshipFilter from "./Filters/ChampionshipFilter";
+import SportsFilter from "./Filters/SportsFilter";
 
 export default function ClientHomePage({ session }: { session: any }) {
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,8 @@ export default function ClientHomePage({ session }: { session: any }) {
     setSelectedSport,
     favoriteSports,
     toggleFavoriteSport,
+    allSports,
+    setAllSports,
   } = useOddsContext();
 
   useEffect(() => {
@@ -36,12 +39,19 @@ export default function ClientHomePage({ session }: { session: any }) {
 
   if (loading) return <div className="p-6">Carregando...</div>
 
-  
-
+  const selectedGroup = allSports.find((g) => g.group === selectedSport);
+  const selectedKeys = selectedGroup ? selectedGroup.keys : [];
   // Filtrar odds pelo esporte selecionado (se houver)
-  const filteredOdds = selectedSport
-    ? odds.filter((odd) => odd.sport_title === selectedSport)
-    : odds;
+  // const filteredOdds = selectedSport
+  //   ? odds.filter((odd) => odd.sport_title === selectedSport)
+  //   : odds;
+  // const filteredOdds = selectedGroup
+  // ? odds.filter((odd) => selectedGroup.keys.includes(odd.sport_key))
+  // : odds;
+
+  const filteredOdds = selectedKeys.length > 0
+  ? odds.filter((odd) => selectedKeys.includes(odd.sport_key))
+  : odds;
 
   const now = Date.now()
 
@@ -105,38 +115,7 @@ export default function ClientHomePage({ session }: { session: any }) {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {Array.from(new Set(odds.map((o) => o.sport_title))).map((sport) => {
-          const isFavorite = favoriteSports.includes(sport);
-          return (
-            <div key={sport} className="flex items-center gap-1">
-              <button
-                onClick={() => setSelectedSport(sport)}
-                className={`px-3 py-1 rounded border ${
-                  selectedSport === sport
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                }`}
-              >
-                {sport}
-              </button>
-              <button
-                onClick={() => toggleFavoriteSport(sport)}
-                aria-label={`Favoritar esporte ${sport}`}
-              >
-                {isFavorite ? "⭐" : "☆"}
-              </button>
-            </div>
-          );
-        })}
-        {/* Botão para limpar selectedSport */}
-        {selectedSport && (
-          <button
-            onClick={() => setSelectedSport("")}	
-            className="ml-4 px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
-          >
-            Limpar filtro de esporte
-          </button>
-        )}
+        <SportsFilter />
       </div>
 
       {/* <FilterBar sports={Array.from(new Set(odds.map((o) => o.sport_title)))} /> */}
