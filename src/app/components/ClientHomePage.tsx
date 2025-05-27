@@ -140,8 +140,8 @@ export default function ClientHomePage({ session }: { session: any }) {
       </div>
 
       {/* <FilterBar sports={Array.from(new Set(odds.map((o) => o.sport_title)))} /> */}
-      <OddsFilter />
-      <ChampionshipFilter odds={odds} />
+      {/* <OddsFilter /> */}
+      {/* <ChampionshipFilter odds={odds} /> */}
       <DropdownAccordion
         title={
           <div className="flex items-center gap-2">

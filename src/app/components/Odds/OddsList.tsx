@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { ArrowRight } from 'lucide-react';
 
 type Odd = {
   id: string;
@@ -11,7 +13,9 @@ type Odd = {
   away_team: string;
   bookmakers: {
     key: string;
+    title: string;
     markets: {
+      key: string;
       outcomes: {
         name: string;
         price: number;
@@ -42,24 +46,34 @@ function formatDateTime(dateStr: string) {
 }
 
 export default function OddsList({ odds }: OddsListProps) {
-  // Função para encontrar a maior odd (preço) dentre os outcomes
-  const getBestOdd = (bookmakers: Odd['bookmakers']) => {
+  const router = useRouter();
+
+  // Encontra a melhor odd entre todas as casas de aposta
+  const getBestOddAndBookmaker = (bookmakers: Odd['bookmakers']) => {
     let bestPrice = 0;
+    let bestOutcome: string | null = null;
+    let bestBookmaker: string | null = null;
+
     bookmakers.forEach((bookmaker) => {
       bookmaker.markets.forEach((market) => {
         market.outcomes.forEach((outcome) => {
-          if (outcome.price > bestPrice) bestPrice = outcome.price;
+          if (outcome.price > bestPrice) {
+            bestPrice = outcome.price;
+            bestOutcome = outcome.name;
+            bestBookmaker = bookmaker.title;
+          }
         });
       });
     });
-    return bestPrice;
+
+    return { bestPrice, bestOutcome, bestBookmaker };
   };
 
   return (
     <ul className="space-y-4 mt-3">
       <AnimatePresence>
         {odds.map((odd) => {
-          const bestOdd = getBestOdd(odd.bookmakers);
+          const { bestPrice, bestOutcome, bestBookmaker } = getBestOddAndBookmaker(odd.bookmakers);
           return (
             <motion.li
               key={odd.id}
@@ -68,35 +82,30 @@ export default function OddsList({ odds }: OddsListProps) {
               animate="visible"
               exit="exit"
               layout
-              className="bg-white rounded-md shadow-md p-4 hover:shadow-lg transition-shadow duration-300"
+              onClick={() => router.push(`/odds/${odd.id}`)}
+              className="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 cursor-pointer border border-gray-200 hover:border-blue-500 group"
             >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold text-lg">
-                  {odd.home_team} vs {odd.away_team}
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold text-xl text-gray-900">
+                  {odd.home_team} <span className="text-gray-400">vs</span> {odd.away_team}
                 </h3>
-                <span className="text-sm text-gray-500">{formatDateTime(odd.commence_time)}</span>
+                <span className="text-sm text-gray-500">
+                  {formatDateTime(odd.commence_time)}
+                </span>
               </div>
-    
-              <ul className="flex gap-4 flex-wrap">
-                {odd.bookmakers.map((bookmaker) =>
-                  bookmaker.markets.map((market, mIndex) =>
-                    market.outcomes.map((outcome, oIndex) => {
-                      const isBest = outcome.price === bestOdd;
-                      return (
-                        <li
-                          key={`${bookmaker.key}-${mIndex}-${oIndex}`}
-                          className={`px-3 py-1 rounded cursor-pointer select-none transition-colors duration-200
-                            ${isBest ? 'bg-green-500 text-white font-bold shadow-md' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
-                          `}
-                          title={`${outcome.name} - Odd: ${outcome.price}`}
-                        >
-                          {outcome.name}: {outcome.price.toFixed(2)}
-                        </li>
-                      );
-                    })
-                  )
-                )}
-              </ul>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="text-base text-gray-700">
+                  Melhor Aposta: <span className="font-semibold text-green-600">{bestOutcome}</span>
+                  <br />
+                  Odd: <span className="font-semibold">{bestPrice.toFixed(2)}</span>
+                  <br />
+                  Casa: <span className="italic text-blue-600">{bestBookmaker}</span>
+                </div>
+                <div className="flex items-center gap-2 text-blue-600 group-hover:translate-x-1 transition-transform">
+                  <span className="text-sm font-medium">Ver detalhes</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
             </motion.li>
           );
         })}

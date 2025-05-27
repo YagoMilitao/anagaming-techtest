@@ -5,10 +5,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 type OddsContextType = {
   selectedChampionship: string;
   setSelectedChampionship: (championship: string) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
   selectedSport: string;
   setSelectedSport: (sport: string) => void;
+  applySportFilter: (sport: string) => void;
+  applyChampionshipFilter: (championship: string) => void;
+  sortBy: string;
+  setSortBy: (value: string) => void;
   favoriteSports: string[];
   toggleFavoriteSport: (sport: string) => void;
 };
@@ -18,7 +20,7 @@ const OddsContext = createContext<OddsContextType | undefined>(undefined);
 export const OddsProvider = ({ children }: { children: ReactNode }) => {
   const [sortBy, setSortBy] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
-  const [selectedChampionship, setSelectedChampionship] = useState("");
+  const [selectedChampionship, setSelectedChampionship] = useState('');
 
   const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -44,15 +46,27 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const applySportFilter = (sport: string) => {
+    setSelectedSport(sport);
+    setSelectedChampionship('');
+  };
+
+  const applyChampionshipFilter = (championship: string) => {
+    setSelectedChampionship(championship);
+    setSelectedSport('');
+  };
+
   return (
     <OddsContext.Provider
       value={{
         selectedChampionship,
         setSelectedChampionship,
-        sortBy,
-        setSortBy,
         selectedSport,
         setSelectedSport,
+        applySportFilter,
+        applyChampionshipFilter,
+        sortBy,
+        setSortBy,
         favoriteSports,
         toggleFavoriteSport,
       }}

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { fetchOddById } from '@/app/lib/fetchOdds';
 
 interface Outcome {
   name: string;
@@ -34,7 +35,9 @@ export interface OddData {
   [key: string]: any;
 }
 
-interface OddDetailsProps {}
+interface OddDetailsProps {
+    odd: any;
+}
 
 export default function OddDetails(props: OddDetailsProps) {
   const params = useParams();
@@ -49,7 +52,7 @@ export default function OddDetails(props: OddDetailsProps) {
     async function loadOdd() {
       if (!oddId) return;
       try {
-        const data = await fetchOddById(sport)
+        const data = await fetchOddById(sport,oddId)
         setOdd(data);
         setLoading(false);
       } catch (err: any) {
@@ -68,43 +71,48 @@ export default function OddDetails(props: OddDetailsProps) {
   const commenceDate = new Date(odd.commence_time);
 
   return (
-    <main className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">Detalhes da Odd</h1>
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">{odd.sport_title}</h2>
-        <p><strong>Evento:</strong> {odd.home_team} vs {odd.away_team}</p>
-        <p><strong>Data e hora:</strong> {commenceDate.toLocaleString()}</p>
-        <p><strong>Status:</strong> {odd.status}</p>
-      </section>
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">
+        {odd.home_team} vs {odd.away_team}
+      </h1>
 
-      <section>
-        <h3 className="text-lg font-semibold mb-2">Bookmakers e Odds</h3>
-        {odd.bookmakers?.length === 0 && <p>Nenhum bookmaker disponível para essa odd.</p>}
-        {odd.bookmakers?.map((bookmaker: Bookmaker) => (
-          <div key={bookmaker.key} className="mb-4 border p-3 rounded-md bg-gray-50">
-            <h4 className="font-semibold">{bookmaker.title}</h4>
-            <ul className="list-disc list-inside">
-              {bookmaker.markets?.map((market: Market) =>
-                market.outcomes.map((outcome: Outcome) => (
-                  <li key={outcome.name}>
+      <p className="text-gray-600 mb-2">
+        <strong>Esporte:</strong> {odd.sport_title}
+      </p>
+      <p className="text-gray-600 mb-2">
+        <strong>Data:</strong> {new Date(odd.commence_time).toLocaleString()}
+      </p>
+      <p className="text-gray-600 mb-4">
+        <strong>Campeonato:</strong> {odd.league_name}
+      </p>
+
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Odds disponíveis:</h2>
+        {odd.bookmakers.map((bookmaker: any) => (
+          <div key={bookmaker.key} className="mb-4 border p-4 rounded shadow">
+            <h3 className="text-lg font-bold mb-2">{bookmaker.title}</h3>
+            {bookmaker.markets.map((market: any, idx: number) => (
+              <div key={idx}>
+                {market.outcomes.map((outcome: any) => (
+                  <p key={outcome.name}>
                     {outcome.name}: <strong>{outcome.price}</strong>
-                  </li>
-                ))
-              )}
-            </ul>
+                  </p>
+                ))}
+              </div>
+            ))}
           </div>
         ))}
-      </section>
+      </div>
     </main>
   );
 }
 
-async function fetchOddById(oddId: string): Promise<OddData> {
-  const response = await fetch(`/api/odds/${oddId}`);
-  if (!response.ok) {
-    const message = `Erro ao buscar odd com ID ${oddId}: ${response.status}`;
-    throw new Error(message);
-  }
-  const data = await response.json();
-  return data as OddData;
-}
+// async function fetchOddById(oddId: string): Promise<OddData> {
+//   const response = await fetch(`/api/odds/${oddId}`);
+//   if (!response.ok) {
+//     const message = `Erro ao buscar odd com ID ${oddId}: ${response.status}`;
+//     throw new Error(message);
+//   }
+//   const data = await response.json();
+//   return data as OddData;
+// }
