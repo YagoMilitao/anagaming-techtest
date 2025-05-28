@@ -65,14 +65,12 @@ export const OddsProvider = ({ children }: { children: ReactNode }) => {
     const res = await fetch(`https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}`);
     const data = await res.json();
 
-    // Agrupar por group
     const grouped: { [group: string]: string[] } = {};
     data.forEach((sport: any) => {
       if (!grouped[sport.group]) grouped[sport.group] = [];
       grouped[sport.group].push(sport.key);
     });
 
-    // Transformar em array
     const uniqueGroups = Object.entries(grouped).map(([group, keys]) => ({ group, keys }));
 
     setAllSports(uniqueGroups);

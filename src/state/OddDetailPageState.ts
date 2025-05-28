@@ -55,7 +55,7 @@ export class OddDetailPageState {
         this.setOdd(null); // Garante que a odd é nula se não houver dados válidos
       }
 
-    } catch (error: any) {
+    } catch (error: String | any) {
       console.error(`Erro ao carregar detalhes da odd ${this.oddId}:`, error);
       this.setErrorMessage(error.message || "Erro desconhecido ao carregar detalhes da odd.");
       this.setOdd(null); // Garante que a odd é nula em caso de erro

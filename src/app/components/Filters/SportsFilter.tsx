@@ -2,7 +2,7 @@ import { useOddsContext } from "@/app/context/OddsContext";
 
 export default function SportsFilter() {
   const {
-    allSports, // agora: { group, keys[] }
+    allSports,
     selectedSport,
     setSelectedSport,
     favoriteSports,
@@ -11,7 +11,7 @@ export default function SportsFilter() {
 
   return (
     <div className="flex flex-wrap gap-2 mt-4 mb-6">
-      {allSports.map(({ group, keys }) => {
+      {allSports.map(({ group }) => {
         const isFavorite = favoriteSports.includes(group);
         const isSelected = selectedSport === group;
 

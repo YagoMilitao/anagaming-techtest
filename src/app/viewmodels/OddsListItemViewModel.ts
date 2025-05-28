@@ -1,6 +1,5 @@
-// src/viewmodels/OddsListItemViewModel.ts
 
-import { OddData, Bookmaker, Market, Outcome } from '@/data/Odd'; // Importe as interfaces originais
+import { OddData, Bookmaker} from '@/data/Odd'; // Importe as interfaces originais
 
 /**
  * @interface OddsListItemViewModel
@@ -40,9 +39,8 @@ export class OddsListItemViewModel {
     this.commence_time = odd.commence_time;
     this.home_team = odd.home_team;
     this.away_team = odd.away_team;
-    this.league_name = odd.league_name; // Atribui a propriedade opcional
+    this.league_name = odd.league_name; 
 
-    // Calcula as melhores odds H2H e atribui às propriedades do ViewModel
     const { 
       bestPriceHome, 
       bestOutcomeHome, 

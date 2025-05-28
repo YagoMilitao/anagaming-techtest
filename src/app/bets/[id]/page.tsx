@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa';
 import { OddDetail } from '@/data/Odd';
+import OddsSkeleton from '@/app/components/OddsSkeleton';
 
 
 
@@ -28,8 +29,8 @@ export default function OddDetailPage() {
     fetchOdd();
   }, [id]);
 
-  if (loading) {
-    return <div className="p-6">Carregando...</div>;
+  if (loading ) {
+    return <OddsSkeleton />;
   }
 
   if (!odd) {

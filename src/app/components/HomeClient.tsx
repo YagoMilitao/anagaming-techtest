@@ -2,13 +2,13 @@
 
 import { useSession } from 'next-auth/react';
 import LoginButton from './LoginButton';
-
-import Link from 'next/link';
+import OddsSkeleton from './OddsSkeleton';
 
 export default function HomeClient() {
   const { data: session, status } = useSession();
-
-  if (status === 'loading') return <p>Carregando...</p>;
+  if (status === 'loading' ) {
+      return <OddsSkeleton />;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-8">

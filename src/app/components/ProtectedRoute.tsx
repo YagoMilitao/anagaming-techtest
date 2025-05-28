@@ -3,6 +3,7 @@
 import { useSession, signIn } from 'next-auth/react';
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import OddsSkeleton from './OddsSkeleton';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
@@ -14,8 +15,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
   }, [status, pathname]);
 
-  if (status === 'loading') {
-    return <div className="p-4 text-center">Carregando...</div>;
+  if (status === 'loading' ) {
+      return <OddsSkeleton />;
   }
 
   if (status === 'authenticated') {
