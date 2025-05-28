@@ -1,121 +1,134 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState } from "react"
-import { fetchOddsData } from "../lib/fetchOdds"
-import { useOddsContext } from "../context/OddsContext"
-import UserPanel from "./User/UserPanel"
-import DropdownAccordion from "./DropdownAccordion"
-import SportsFilter from "./Filters/SportsFilter"
-import { Session } from "next-auth"
-import OddsSkeleton from "./OddsSkeleton"
-import { OddData } from "@/data/Odd"
-import OddsList from "./Odds/OddsList"
+import React, { useEffect, useState } from "react";
+import { fetchOddsData } from "../lib/fetchOdds";
+import { useOddsContext } from "../context/OddsContext";
+import UserPanel from "./User/UserPanel";
+import DropdownAccordion from "./DropdownAccordion";
+import SportsFilter from "./Filters/SportsFilter";
+import { Session } from "next-auth";
+import OddsSkeleton from "./OddsSkeleton";
+import { OddData } from "@/data/Odd";
+import OddsList from "./Odds/OddsList";
+import LoginButton from "./User/LoginButton";
 
-export default function ClientHomePage({ session }: { session: Session }) {
-  const [loading, setLoading] = useState(true)
-  const [odds, setOdds] = useState<OddData[]>([]) 
+export default function ClientHomePage({ session }: { session: Session | null }) {
+  const [loading, setLoading] = useState(true);
+  const [odds, setOdds] = useState<OddData[]>([]);
 
   const {
     selectedSport,
     favoriteSports,
     toggleFavoriteSport,
     allSports,
-  } = useOddsContext()
+  } = useOddsContext();
 
   useEffect(() => {
     async function loadOdds() {
       try {
-        const fetchedOdds = await fetchOddsData()
+        const fetchedOdds = await fetchOddsData();
         if (Array.isArray(fetchedOdds)) {
-          setOdds(fetchedOdds)
+          setOdds(fetchedOdds);
         } else {
-          console.error("fetchOddsData retornou dados em formato inesperado:", fetchedOdds)
-          setOdds([])
+          console.error("fetchOddsData retornou dados em formato inesperado:", fetchedOdds);
+          setOdds([]);
         }
       } catch (error) {
-        console.error("Erro ao carregar odds:", error)
-        setOdds([])
+        console.error("Erro ao carregar odds:", error);
+        setOdds([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    loadOdds()
-  }, [])
-  
+    loadOdds();
+  }, []);
+
   if (loading) {
-    return <OddsSkeleton />
+    return <OddsSkeleton />;
   }
 
+  if (!session) {
+    return (
+      <main className="p-6 max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Bem-vindo à Anagaming!</h1>
+        <p className="mb-4">Por favor, faça login para acessar todas as funcionalidades.</p>
+        <LoginButton /> 
+        <div className="flex flex-wrap gap-2 mb-6">
+          <SportsFilter />
+        </div>
+      </main>
+    );
+  }
 
-  const selectedGroup = allSports.find((g) => g.group === selectedSport)
-  const selectedKeys: string[] = selectedGroup ? selectedGroup.keys : []
+  const selectedGroup = allSports.find((g) => g.group === selectedSport);
+  const selectedKeys: string[] = selectedGroup ? selectedGroup.keys : [];
 
   const filteredOdds = selectedKeys.length > 0
     ? odds.filter((odd) => selectedKeys.includes(odd.sport_key))
-    : odds
+    : odds;
 
-  const now = Date.now()
+  const now = Date.now();
 
   const liveGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime()
+    const start = new Date(odd.commence_time).getTime();
     if (isNaN(start)) {
-      console.warn(`LiveGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
-      return false
+      console.warn(`LiveGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
+      return false;
     }
-    return start <= now && now <= start + 3 * 60 * 60 * 1000
-  })
+    return start <= now && now <= start + 3 * 60 * 60 * 1000;
+  });
 
   const futureGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime()
+    const start = new Date(odd.commence_time).getTime();
     if (isNaN(start)) {
-      console.warn(`FutureGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
-      return false
+      console.warn(`FutureGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
+      return false;
     }
-    return start > now
-  })
+    return start > now;
+  });
 
   const finishedGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime()
+    const start = new Date(odd.commence_time).getTime();
     if (isNaN(start)) {
-      console.warn(`FinishedGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
-      return false
+      console.warn(`FinishedGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
+      return false;
     }
-    return start + 3 * 60 * 60 * 1000 < now 
-  })
-  
+    return start + 3 * 60 * 60 * 1000 < now;
+  });
+
   function sortByCommenceTimeAsc(games: OddData[]): OddData[] {
     if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeAsc: 'games' não é um array. Retornando array vazio.")
-      return []
+      console.warn("sortByCommenceTimeAsc: 'games' não é um array. Retornando array vazio.");
+      return [];
     }
     return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime()
-      const timeB = new Date(b.commence_time).getTime()
-      if (isNaN(timeA) && isNaN(timeB)) return 0
-      if (isNaN(timeA)) return 1
-      if (isNaN(timeB)) return -1
-      return timeA - timeB
-    })
+      const timeA = new Date(a.commence_time).getTime();
+      const timeB = new Date(b.commence_time).getTime();
+      if (isNaN(timeA) && isNaN(timeB)) return 0;
+      if (isNaN(timeA)) return 1;
+      if (isNaN(timeB)) return -1;
+      return timeA - timeB;
+    });
   }
 
   function sortByCommenceTimeDesc(games: OddData[]): OddData[] {
     if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeDesc: 'games' não é um array. Retornando array vazio.")
-      return []
+      console.warn("sortByCommenceTimeDesc: 'games' não é um array. Retornando array vazio.");
+      return [];
     }
     return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime()
-      const timeB = new Date(b.commence_time).getTime()
-      if (isNaN(timeA) && isNaN(timeB)) return 0
-      if (isNaN(timeA)) return 1
-      if (isNaN(timeB)) return -1
-      return timeB - timeA
-    })
+      const timeA = new Date(a.commence_time).getTime();
+      const timeB = new Date(b.commence_time).getTime();
+      if (isNaN(timeA) && isNaN(timeB)) return 0;
+      if (isNaN(timeA)) return 1;
+      if (isNaN(timeB)) return -1;
+      return timeB - timeA;
+    });
   }
-  
-  const sortedLiveGames = sortByCommenceTimeAsc(liveGames)
-  const sortedFutureGames = sortByCommenceTimeAsc(futureGames)
-  const sortedFinishedGames = sortByCommenceTimeDesc(finishedGames)
+
+  const sortedLiveGames = sortByCommenceTimeAsc(liveGames);
+  const sortedFutureGames = sortByCommenceTimeAsc(futureGames);
+  const sortedFinishedGames = sortByCommenceTimeDesc(finishedGames);
 
   return (
     <main className="p-6 max-w-5xl mx-auto">
@@ -125,7 +138,7 @@ export default function ClientHomePage({ session }: { session: Session }) {
         {favoriteSports.length > 0 && (
           <button
             onClick={() => {
-              favoriteSports.forEach((sport) => toggleFavoriteSport(sport))
+              favoriteSports.forEach((sport) => toggleFavoriteSport(sport));
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
             aria-label="Limpar categorias favoritas"
@@ -173,5 +186,5 @@ export default function ClientHomePage({ session }: { session: Session }) {
         <OddsList odds={sortedFinishedGames} />
       </DropdownAccordion>
     </main>
-  )
+  );
 }
