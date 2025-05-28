@@ -47,19 +47,6 @@ export default function ClientHomePage({ session }: { session: Session | null })
     return <OddsSkeleton />;
   }
 
-  if (!session) {
-    return (
-      <main className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Bem-vindo à Anagaming!</h1>
-        <p className="mb-4">Por favor, faça login para acessar todas as funcionalidades.</p>
-        <LoginButton /> 
-        <div className="flex flex-wrap gap-2 mb-6">
-          <SportsFilter />
-        </div>
-      </main>
-    );
-  }
-
   const selectedGroup = allSports.find((g) => g.group === selectedSport);
   const selectedKeys: string[] = selectedGroup ? selectedGroup.keys : [];
 
@@ -71,58 +58,32 @@ export default function ClientHomePage({ session }: { session: Session | null })
 
   const liveGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime();
-    if (isNaN(start)) {
-      console.warn(`LiveGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
-    }
-    return start <= now && now <= start + 3 * 60 * 60 * 1000;
+    return !isNaN(start) && start <= now && now <= start + 3 * 60 * 60 * 1000;
   });
 
   const futureGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime();
-    if (isNaN(start)) {
-      console.warn(`FutureGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
-    }
-    return start > now;
+    return !isNaN(start) && start > now;
   });
 
   const finishedGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime();
-    if (isNaN(start)) {
-      console.warn(`FinishedGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
-    }
-    return start + 3 * 60 * 60 * 1000 < now;
+    return !isNaN(start) && start + 3 * 60 * 60 * 1000 < now;
   });
 
   function sortByCommenceTimeAsc(games: OddData[]): OddData[] {
-    if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeAsc: 'games' não é um array. Retornando array vazio.");
-      return [];
-    }
     return [...games].sort((a, b) => {
       const timeA = new Date(a.commence_time).getTime();
       const timeB = new Date(b.commence_time).getTime();
-      if (isNaN(timeA) && isNaN(timeB)) return 0;
-      if (isNaN(timeA)) return 1;
-      if (isNaN(timeB)) return -1;
-      return timeA - timeB;
+      return (isNaN(timeA) ? 1 : timeA) - (isNaN(timeB) ? 1 : timeB);
     });
   }
 
   function sortByCommenceTimeDesc(games: OddData[]): OddData[] {
-    if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeDesc: 'games' não é um array. Retornando array vazio.");
-      return [];
-    }
     return [...games].sort((a, b) => {
       const timeA = new Date(a.commence_time).getTime();
       const timeB = new Date(b.commence_time).getTime();
-      if (isNaN(timeA) && isNaN(timeB)) return 0;
-      if (isNaN(timeA)) return 1;
-      if (isNaN(timeB)) return -1;
-      return timeB - timeA;
+      return (isNaN(timeB) ? 1 : timeB) - (isNaN(timeA) ? 1 : timeA);
     });
   }
 
@@ -132,10 +93,19 @@ export default function ClientHomePage({ session }: { session: Session | null })
 
   return (
     <main className="p-6 max-w-5xl mx-auto">
-      <UserPanel session={session} />
+      {session ? (
+        <UserPanel session={session} />
+      ) : (
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Bem-vindo à Anagaming!</h1>
+          <p className="mb-2 text-gray-700">Explore as odds ao vivo abaixo. Faça login para acessar recursos como favoritos.</p>
+          <LoginButton />
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Apostas ao Vivo</h1>
-        {favoriteSports.length > 0 && (
+        <h2 className="text-2xl font-bold">Apostas ao Vivo</h2>
+        {session && favoriteSports.length > 0 && (
           <button
             onClick={() => {
               favoriteSports.forEach((sport) => toggleFavoriteSport(sport));
@@ -147,39 +117,31 @@ export default function ClientHomePage({ session }: { session: Session | null })
           </button>
         )}
       </div>
+
       <div className="flex flex-wrap gap-2 mb-6">
         <SportsFilter />
       </div>
+
       <DropdownAccordion
-        title={
-          <div className="flex items-center gap-2">
-            <span>Jogos Ao Vivo</span>
-          </div>
-        }
+        title={<span>Jogos Ao Vivo</span>}
         defaultOpen
         count={sortedLiveGames.length}
         status="live"
       >
         <OddsList odds={sortedLiveGames} />
       </DropdownAccordion>
+
       <DropdownAccordion
-        title={
-          <div className="flex items-center gap-2">
-            <span>Jogos Futuros</span>
-          </div>
-        }
+        title={<span>Jogos Futuros</span>}
         defaultOpen
         count={sortedFutureGames.length}
         status="future"
       >
         <OddsList odds={sortedFutureGames} />
       </DropdownAccordion>
+
       <DropdownAccordion
-        title={
-          <div className="flex items-center gap-2">
-            <span>Jogos Encerrados</span>
-          </div>
-        }
+        title={<span>Jogos Encerrados</span>}
         count={sortedFinishedGames.length}
         status="finished"
       >
