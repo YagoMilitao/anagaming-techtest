@@ -15,22 +15,19 @@ export async function fetchOddsData(): Promise<OddData[]> {
             throw new Error(`Erro ao buscar odds: ${res.status} - ${res.statusText} - ${errorText}`)
         }
 
-        const data: OddData[] = await res.json() // <-- Tipado como OddData[]
-        // Validação básica para garantir que é um array
+        const data: OddData[] = await res.json()
         if (!Array.isArray(data)) {
             console.error("fetchOddsData: Resposta da API não é um array de OddData.", data)
-            return [] // Retorna array vazio em caso de formato inesperado
+            return []
         }
         return data
     } catch (error) {
         console.error("Erro em fetchOddsData:", error)
-        // Em um Server Component, você pode relançar o erro ou retornar um array vazio
-        // Dependendo de como você quer que o componente chamador lide com isso.
         return [] 
     }
 }
 
-export async function fetchOddById(sport: string, eventId: string): Promise<OddData | null> { // <-- Retorna OddData ou null
+export async function fetchOddById(sport: string, eventId: string): Promise<OddData | null> {
     const apiKey = process.env.NEXT_PUBLIC_ODDS_API_KEY
     if (!apiKey) {
         console.error("API key não definida.")
@@ -48,20 +45,18 @@ export async function fetchOddById(sport: string, eventId: string): Promise<OddD
             return null
         }
 
-        const data: OddData = await response.json() // <-- Tipado como OddData
-        // Validação básica para garantir que é um objeto e tem um ID
+        const data: OddData = await response.json() 
         if (!data || typeof data !== 'object' || !('id' in data)) {
             console.warn(`fetchOddById: Dados recebidos para evento ${eventId} não são um objeto OddData válido.`, data)
             return null
         }
         return data
-    } catch (error: any) {
+    } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
         console.error(`Erro ao buscar detalhes do evento ${eventId} para o esporte ${sport}:`, error)
         return null
     }
 }
 
-// Mantenha as outras funções (fetchSports, fetchAllSports, etc.) aqui e tipadas corretamente
 export async function fetchSports(): Promise<SportGroup[]> {
     const url = `https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.ODDS_API_KEY}`
     const res = await fetch(url, { cache: 'no-store' })

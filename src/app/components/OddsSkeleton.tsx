@@ -27,14 +27,11 @@ export default function OddsSkeleton({ count = 5 }) {
             <div className="h-4 w-32 bg-gray-300 rounded animate-pulse" />
             <div className="h-4 w-20 bg-gray-300 rounded animate-pulse" />
           </div>
-
           <div className="h-5 w-3/4 bg-gray-300 rounded mb-4" />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <div className="h-4 w-full bg-gray-300 rounded" />
             <div className="h-4 w-full bg-gray-300 rounded" />
           </div>
-
           <div className="h-4 w-32 bg-gray-300 rounded" />
         </motion.li>
       ))}

@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { formatDate } from '@/utils/formatDate';
-import { getBestH2HOutcome } from '@/app/viewmodels/oddsListViewModel';
-import { useOddsListState } from '@/state/oddsListState';
-import { OddData } from '@/data/Odd';
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
+import { formatDate } from '@/utils/formatDate'
+import { getBestH2HOutcome } from '@/app/viewmodels/oddsListViewModel'
+import { useOddsListState } from '@/state/oddsListState'
+import { OddData } from '@/data/Odd'
 
 import {
   DndContext,
@@ -15,24 +15,24 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from '@dnd-kit/core'
 import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
-} from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from '@dnd-kit/sortable'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface OddsListProps {
-  odds: OddData[];
+  odds: OddData[]
 }
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },
-};
+}
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   const {
@@ -41,28 +41,28 @@ const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id,
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id });
+  } = useSortable({ id })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     cursor: 'grab',
-  };
+  }
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {children}
     </div>
-  );
-};
+  )
+}
 
 const OddsList: React.FC<OddsListProps> = ({ odds }) => {
-  const { navigateToDetails } = useOddsListState();
-  const [items, setItems] = useState<string[]>(odds.map((odd) => odd.id));
+  const { navigateToDetails } = useOddsListState()
+  const [items, setItems] = useState<string[]>(odds.map((odd) => odd.id))
 
   useEffect(() => {
-    setItems(odds.map((odd) => odd.id));
-  }, [odds]);
+    setItems(odds.map((odd) => odd.id))
+  }, [odds])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -70,17 +70,17 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
         distance: 5,
       },
     })
-  );
+  )
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over } = event
     if (over && active.id !== over.id) {
-      const oldIndex = items.indexOf(String(active.id));
-      const newIndex = items.indexOf(String(over.id));
-      const newItems = arrayMove(items, oldIndex, newIndex);
-      setItems(newItems);
+      const oldIndex = items.indexOf(String(active.id))
+      const newIndex = items.indexOf(String(over.id))
+      const newItems = arrayMove(items, oldIndex, newIndex)
+      setItems(newItems)
     }
-  };
+  }
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -88,8 +88,8 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
         <ul className="space-y-4 mt-3">
           <AnimatePresence>
             {items.map((id) => {
-              const odd = odds.find((o) => o.id === id);
-              if (!odd) return null;
+              const odd = odds.find((o) => o.id === id)
+              if (!odd) return null
 
               const {
                 bestPriceHome,
@@ -98,7 +98,9 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
                 bestPriceAway,
                 bestOutcomeAway,
                 bestBookmakerAway,
-              } = getBestH2HOutcome(odd.bookmakers, odd);
+              } = getBestH2HOutcome(odd.bookmakers, odd)
+
+              
 
               return (
                 <SortableItem key={odd.id} id={odd.id}>
@@ -126,7 +128,7 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                       <div>
                         <div className="text-base text-gray-700">
-                          Melhor Odd {odd.home_team}:{' '}
+                          Melhor Odd:{' '}
                           <span className="font-semibold text-green-600">
                             {bestOutcomeHome || '-'}
                           </span>{' '}
@@ -141,7 +143,7 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
 
                       <div>
                         <div className="text-base text-gray-700">
-                          Melhor Odd {odd.away_team}:{' '}
+                          Melhor Odd:{' '}
                           <span className="font-semibold text-green-600">
                             {bestOutcomeAway || '-'}
                           </span>{' '}
@@ -161,13 +163,13 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
                     </div>
                   </motion.li>
                 </SortableItem>
-              );
+              )
             })}
           </AnimatePresence>
         </ul>
       </SortableContext>
     </DndContext>
-  );
-};
+  )
+}
 
-export default OddsList;
+export default OddsList

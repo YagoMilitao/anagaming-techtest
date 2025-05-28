@@ -1,10 +1,5 @@
-// src/state/ClientHomePageState.ts
-
-import { fetchOddsData, fetchAllSports } from '@/app/lib/fetchOdds'; // Ajuste o caminho conforme necessário
-import { OddData, SportGroup } from '@/data/Odd'; // Importe sua interface OddData
-
-// Defina ou importe a interface SportGroup conforme sua estrutura real
-
+import { fetchOddsData, fetchAllSports } from '@/app/lib/fetchOdds' 
+import { OddData, SportGroup } from '@/data/Odd' 
 
 /**
  * @class ClientHomePageState
@@ -12,18 +7,13 @@ import { OddData, SportGroup } from '@/data/Odd'; // Importe sua interface OddDa
  * Inclui o carregamento de dados, filtragem, ordenação e gerenciamento de filtros.
  */
 export class ClientHomePageState {
-  // Estado reativo
-  loading: boolean = true;
-  odds: OddData[] = [];
-  allSports: SportGroup[] = []; // Assumindo que allSports é um array de SportGroup
-  selectedChampionship: string | null = null;
-  selectedSport: string | null = null;
-  favoriteSports: string[] = []; // Assumindo que favoriteSports é um array de strings (chaves de esporte)
-
-  constructor() {
-    // Se estiver usando MobX, descomente a linha abaixo
-    // makeAutoObservable(this); 
-  }
+  
+  loading: boolean = true
+  odds: OddData[] = []
+  allSports: SportGroup[] = [] 
+  selectedChampionship: string | null = null
+  selectedSport: string | null = null
+  favoriteSports: string[] = [] 
 
   /**
    * @method loadInitialData
@@ -31,55 +21,52 @@ export class ClientHomePageState {
    */
   async loadInitialData() {
     try {
-      this.setLoading(true);
+      this.setLoading(true)
       const [oddsData, sportsData] = await Promise.all([
         fetchOddsData(),
         fetchAllSports()
-      ]);
-      this.setOdds(oddsData);
-      this.setAllSports(sportsData);
+      ])
+      this.setOdds(oddsData)
+      this.setAllSports(sportsData)
     } catch (error) {
-      console.error("Erro ao carregar dados iniciais:", error);
-      // Implementar tratamento de erro na UI, se necessário
+      console.error("Erro ao carregar dados iniciais:", error)
     } finally {
-      this.setLoading(false);
+      this.setLoading(false)
     }
   }
 
-  // Métodos para atualizar o estado
   setLoading(value: boolean) {
-    this.loading = value;
+    this.loading = value
   }
 
   setOdds(data: OddData[]) {
-    this.odds = data;
+    this.odds = data
   }
 
   setAllSports(sports: SportGroup[]) {
-    this.allSports = sports;
+    this.allSports = sports
   }
 
   setSelectedChampionship(championship: string | null) {
-    this.selectedChampionship = championship;
+    this.selectedChampionship = championship
   }
 
   setSelectedSport(sport: string | null) {
-    this.selectedSport = sport;
+    this.selectedSport = sport
   }
 
   toggleFavoriteSport(sportKey: string) {
     if (this.favoriteSports.includes(sportKey)) {
-      this.favoriteSports = this.favoriteSports.filter(fav => fav !== sportKey);
+      this.favoriteSports = this.favoriteSports.filter(fav => fav !== sportKey)
     } else {
-      this.favoriteSports.push(sportKey);
+      this.favoriteSports.push(sportKey)
     }
   }
 
   clearFavoriteSports() {
-    this.favoriteSports = [];
+    this.favoriteSports = []
   }
 
-  // Lógica de filtragem e ordenação (agora métodos da classe)
 
   /**
    * @method getFilteredOdds
@@ -87,25 +74,22 @@ export class ClientHomePageState {
    * @returns {OddData[]} As odds filtradas.
    */
   getFilteredOdds(): OddData[] {
-    const selectedGroup = this.allSports.find((g) => g.group === this.selectedSport);
-    const selectedKeys = selectedGroup ? selectedGroup.keys : [];
+    const selectedGroup = this.allSports.find((g) => g.group === this.selectedSport)
+    const selectedKeys = selectedGroup ? selectedGroup.keys : []
 
-    let filtered = this.odds;
+    let filtered = this.odds
 
     if (selectedKeys.length > 0) {
-      filtered = filtered.filter((odd) => selectedKeys.includes(odd.sport_key));
+      filtered = filtered.filter((odd) => selectedKeys.includes(odd.sport_key))
     }
 
-    // Filtra as odds com base no esporte e campeonato selecionados
-    // Nota: O filtro de campeonato no seu código original estava usando 'odd.league_name === selectedChampionship'
-    // e 'odd.sport_title === selectedSport'. Mantenho a lógica original.
     filtered = filtered.filter((odd) => {
-      const matchesSport = this.selectedSport ? odd.sport_title === this.selectedSport : true;
-      const matchesChamp = this.selectedChampionship ? odd.league_name === this.selectedChampionship : true;
-      return matchesSport && matchesChamp;
-    });
+      const matchesSport = this.selectedSport ? odd.sport_title === this.selectedSport : true
+      const matchesChamp = this.selectedChampionship ? odd.league_name === this.selectedChampionship : true
+      return matchesSport && matchesChamp
+    })
 
-    return filtered;
+    return filtered
   }
 
   /**
@@ -114,11 +98,11 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos ao vivo.
    */
   getLiveGames(): OddData[] {
-    const now = Date.now();
+    const now = Date.now()
     return this.getFilteredOdds().filter((odd) => {
-      const start = new Date(odd.commence_time).getTime();
-      return start <= now && now <= start + 3 * 60 * 60 * 1000; // 3 horas de duração
-    });
+      const start = new Date(odd.commence_time).getTime()
+      return start <= now && now <= start + 3 * 60 * 60 * 1000
+    })
   }
 
   /**
@@ -127,11 +111,11 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos futuros.
    */
   getFutureGames(): OddData[] {
-    const now = Date.now();
+    const now = Date.now()
     return this.getFilteredOdds().filter((odd) => {
-      const start = new Date(odd.commence_time).getTime();
-      return start > now;
-    });
+      const start = new Date(odd.commence_time).getTime()
+      return start > now
+    })
   }
 
   /**
@@ -140,11 +124,11 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos encerrados.
    */
   getFinishedGames(): OddData[] {
-    const now = Date.now();
+    const now = Date.now()
     return this.getFilteredOdds().filter((odd) => {
-      const start = new Date(odd.commence_time).getTime();
-      return start + 3 * 60 * 60 * 1000 < now; // Já passou do limite de duração
-    });
+      const start = new Date(odd.commence_time).getTime()
+      return start + 3 * 60 * 60 * 1000 < now 
+    })
   }
 
   /**
@@ -155,7 +139,7 @@ export class ClientHomePageState {
    * @returns {OddData[]} Array ordenado.
    */
   private sortByCommenceTimeAsc(games: OddData[]): OddData[] {
-    return [...games].sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
+    return [...games].sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime())
   }
 
   /**
@@ -166,7 +150,7 @@ export class ClientHomePageState {
    * @returns {OddData[]} Array ordenado.
    */
   private sortByCommenceTimeDesc(games: OddData[]): OddData[] {
-    return [...games].sort((a, b) => new Date(b.commence_time).getTime() - new Date(a.commence_time).getTime());
+    return [...games].sort((a, b) => new Date(b.commence_time).getTime() - new Date(a.commence_time).getTime())
   }
 
   /**
@@ -175,7 +159,7 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos ao vivo ordenados.
    */
   getSortedLiveGames(): OddData[] {
-    return this.sortByCommenceTimeAsc(this.getLiveGames());
+    return this.sortByCommenceTimeAsc(this.getLiveGames())
   }
 
   /**
@@ -184,7 +168,7 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos futuros ordenados.
    */
   getSortedFutureGames(): OddData[] {
-    return this.sortByCommenceTimeAsc(this.getFutureGames());
+    return this.sortByCommenceTimeAsc(this.getFutureGames())
   }
 
   /**
@@ -193,6 +177,6 @@ export class ClientHomePageState {
    * @returns {OddData[]} Jogos encerrados ordenados.
    */
   getSortedFinishedGames(): OddData[] {
-    return this.sortByCommenceTimeDesc(this.getFinishedGames());
+    return this.sortByCommenceTimeDesc(this.getFinishedGames())
   }
 }

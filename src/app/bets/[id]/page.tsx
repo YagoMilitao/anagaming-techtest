@@ -1,40 +1,40 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa';
-import { OddDetail } from '@/data/Odd';
-import OddsSkeleton from '@/app/components/OddsSkeleton';
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa'
+import { OddDetail } from '@/data/Odd'
+import OddsSkeleton from '@/app/components/OddsSkeleton'
 
 
 
 export default function OddDetailPage() {
-  const { id } = useParams();
-  const [odd, setOdd] = useState<OddDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams()
+  const [odd, setOdd] = useState<OddDetail | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchOdd() {
       try {
-        const res = await fetch(`https://api.the-odds-api.com/v4/sports/${id}/odds/?apiKey=${process.env.ODDS_API_KEY}`);
-        const data = await res.json();
-        setOdd(data);
-        setLoading(false);
+        const res = await fetch(`https://api.the-odds-api.com/v4/sports/${id}/odds/?apiKey=${process.env.ODDS_API_KEY}`)
+        const data = await res.json()
+        setOdd(data)
+        setLoading(false)
       } catch (error) {
-        console.error('Erro ao buscar os detalhes da odd:', error);
-        setLoading(false);
+        console.error('Erro ao buscar os detalhes da odd:', error)
+        setLoading(false)
       }
     }
 
-    fetchOdd();
-  }, [id]);
+    fetchOdd()
+  }, [id])
 
   if (loading ) {
-    return <OddsSkeleton />;
+    return <OddsSkeleton />
   }
 
   if (!odd) {
-    return <div className="p-6">Odd não encontrada..</div>;
+    return <div className="p-6">Odd não encontrada..</div>
   }
 
   return (
@@ -72,5 +72,5 @@ export default function OddDetailPage() {
         ))}
       </div>
     </main>
-  );
+  )
 }

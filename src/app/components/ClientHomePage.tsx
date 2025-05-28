@@ -25,26 +25,25 @@ export default function ClientHomePage({ session }: { session: Session }) {
   useEffect(() => {
     async function loadOdds() {
       try {
-        const fetchedOdds = await fetchOddsData();
-        // Correção 2: Adicionar uma verificação para garantir que fetchOdds é um array de OddData
+        const fetchedOdds = await fetchOddsData()
         if (Array.isArray(fetchedOdds)) {
-          setOdds(fetchedOdds);
+          setOdds(fetchedOdds)
         } else {
-          console.error("fetchOddsData retornou dados em formato inesperado:", fetchedOdds);
-          setOdds([]); // Define como array vazio para evitar erros
+          console.error("fetchOddsData retornou dados em formato inesperado:", fetchedOdds)
+          setOdds([])
         }
       } catch (error) {
-        console.error("Erro ao carregar odds:", error);
-        setOdds([]); // Limpa as odds em caso de erro
+        console.error("Erro ao carregar odds:", error)
+        setOdds([])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
     loadOdds()
   }, [])
   
   if (loading) {
-    return <OddsSkeleton />;
+    return <OddsSkeleton />
   }
 
 
@@ -60,8 +59,8 @@ export default function ClientHomePage({ session }: { session: Session }) {
   const liveGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime()
     if (isNaN(start)) {
-      console.warn(`LiveGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
+      console.warn(`LiveGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
+      return false
     }
     return start <= now && now <= start + 3 * 60 * 60 * 1000
   })
@@ -69,8 +68,8 @@ export default function ClientHomePage({ session }: { session: Session }) {
   const futureGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime()
     if (isNaN(start)) {
-      console.warn(`FutureGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
+      console.warn(`FutureGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
+      return false
     }
     return start > now
   })
@@ -78,41 +77,40 @@ export default function ClientHomePage({ session }: { session: Session }) {
   const finishedGames = filteredOdds.filter((odd) => {
     const start = new Date(odd.commence_time).getTime()
     if (isNaN(start)) {
-      console.warn(`FinishedGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`);
-      return false;
+      console.warn(`FinishedGames: Data de início inválida para o evento ${odd.id || 'desconhecido'}: ${odd.commence_time}`)
+      return false
     }
     return start + 3 * 60 * 60 * 1000 < now 
   })
   
   function sortByCommenceTimeAsc(games: OddData[]): OddData[] {
     if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeAsc: 'games' não é um array. Retornando array vazio.");
-      return [];
+      console.warn("sortByCommenceTimeAsc: 'games' não é um array. Retornando array vazio.")
+      return []
     }
     return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime();
-      const timeB = new Date(b.commence_time).getTime();
-      if (isNaN(timeA) && isNaN(timeB)) return 0;
-      if (isNaN(timeA)) return 1;
-      if (isNaN(timeB)) return -1;
-      return timeA - timeB;
-    });
+      const timeA = new Date(a.commence_time).getTime()
+      const timeB = new Date(b.commence_time).getTime()
+      if (isNaN(timeA) && isNaN(timeB)) return 0
+      if (isNaN(timeA)) return 1
+      if (isNaN(timeB)) return -1
+      return timeA - timeB
+    })
   }
 
   function sortByCommenceTimeDesc(games: OddData[]): OddData[] {
     if (!Array.isArray(games)) {
-      console.warn("sortByCommenceTimeDesc: 'games' não é um array. Retornando array vazio.");
-      return [];
+      console.warn("sortByCommenceTimeDesc: 'games' não é um array. Retornando array vazio.")
+      return []
     }
     return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime();
-      const timeB = new Date(b.commence_time).getTime();
-      // Lida com datas inválidas, colocando-as no final
-      if (isNaN(timeA) && isNaN(timeB)) return 0;
-      if (isNaN(timeA)) return 1;
-      if (isNaN(timeB)) return -1;
-      return timeB - timeA;
-    });
+      const timeA = new Date(a.commence_time).getTime()
+      const timeB = new Date(b.commence_time).getTime()
+      if (isNaN(timeA) && isNaN(timeB)) return 0
+      if (isNaN(timeA)) return 1
+      if (isNaN(timeB)) return -1
+      return timeB - timeA
+    })
   }
   
   const sortedLiveGames = sortByCommenceTimeAsc(liveGames)

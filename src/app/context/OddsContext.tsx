@@ -1,6 +1,7 @@
-'use client';
+'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Sport } from '@/data/Odd'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 type OddsContextType = {
   selectedChampionship: string;
@@ -17,70 +18,70 @@ type OddsContextType = {
   setAllSports: (sports: { group: string; keys: string[] }[]) => void;
 };
 
-const OddsContext = createContext<OddsContextType | undefined>(undefined);
+const OddsContext = createContext<OddsContextType | undefined>(undefined)
 
 export const OddsProvider = ({ children }: { children: ReactNode }) => {
-  const [sortBy, setSortBy] = useState('');
-  const [selectedSport, setSelectedSport] = useState('');
-  const [selectedChampionship, setSelectedChampionship] = useState('');
-  const [allSports, setAllSports] = useState<{ group: string, keys: string[] }[]>([]);
+  const [sortBy, setSortBy] = useState('')
+  const [selectedSport, setSelectedSport] = useState('')
+  const [selectedChampionship, setSelectedChampionship] = useState('')
+  const [allSports, setAllSports] = useState<{ group: string, keys: string[] }[]>([])
 
 
   const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem('favoriteSports');
-        return stored ? JSON.parse(stored) : [];
+        const stored = localStorage.getItem('favoriteSports')
+        return stored ? JSON.parse(stored) : []
       } catch {
-        return [];
+        return []
       }
     }
-    return [];
-  });
+    return []
+  })
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('favoriteSports', JSON.stringify(favoriteSports));
+      localStorage.setItem('favoriteSports', JSON.stringify(favoriteSports))
     }
-  }, [favoriteSports]);
+  }, [favoriteSports])
 
   const toggleFavoriteSport = (sport: string) => {
     setFavoriteSports(prev =>
       prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport]
-    );
-  };
+    )
+  }
 
   const applySportFilter = (sport: string) => {
-    setSelectedSport(sport);
-    setSelectedChampionship('');
-  };
+    setSelectedSport(sport)
+    setSelectedChampionship('')
+  }
 
   const applyChampionshipFilter = (championship: string) => {
-    setSelectedChampionship(championship);
-    setSelectedSport('');
-  };
+    setSelectedChampionship(championship)
+    setSelectedSport('')
+  }
 
   async function loadSports() {
   try {
-    const res = await fetch(`https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}`);
-    const data = await res.json();
+    const res = await fetch(`https://api.the-odds-api.com/v4/sports/?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}`)
+    const data = await res.json()
 
-    const grouped: { [group: string]: string[] } = {};
-    data.forEach((sport: any) => {
-      if (!grouped[sport.group]) grouped[sport.group] = [];
-      grouped[sport.group].push(sport.key);
-    });
+    const grouped: { [group: string]: string[] } = {}
+    data.forEach((sport: Sport) => {
+      if (!grouped[sport.group]) grouped[sport.group] = []
+      grouped[sport.group].push(sport.key)
+    })
 
-    const uniqueGroups = Object.entries(grouped).map(([group, keys]) => ({ group, keys }));
+    const uniqueGroups = Object.entries(grouped).map(([group, keys]) => ({ group, keys }))
 
-    setAllSports(uniqueGroups);
+    setAllSports(uniqueGroups)
   } catch (error) {
-    console.error('Erro ao buscar esportes:', error);
+    console.error('Erro ao buscar esportes:', error)
   }
 }
 useEffect(() => {
-  loadSports();
-}, []);
+  loadSports()
+}, [])
 
 
 

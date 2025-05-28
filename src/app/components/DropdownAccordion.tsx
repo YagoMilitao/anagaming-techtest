@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { useState, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, ReactNode } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface DropdownAccordionProps {
-  title: ReactNode;
-  defaultOpen?: boolean;
-  children: ReactNode;
-  count?: number;
-  status?: 'live' | 'future' | 'finished'; // novo prop para bolinha
+  title: ReactNode
+  defaultOpen?: boolean
+  children: ReactNode
+  count?: number
+  status?: 'live' | 'future' | 'finished'
 }
 
 const statusColors = {
   live: 'bg-red-500',
   future: 'bg-blue-500',
   finished: 'bg-gray-400',
-};
+}
 
 export default function DropdownAccordion({ title, defaultOpen = false, children, count, status }: DropdownAccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen)
 
   return (
     <div className="mb-4 border border-gray-300 rounded-md shadow-sm">
@@ -78,5 +78,5 @@ export default function DropdownAccordion({ title, defaultOpen = false, children
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }

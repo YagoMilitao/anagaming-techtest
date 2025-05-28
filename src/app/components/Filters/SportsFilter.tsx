@@ -1,4 +1,4 @@
-import { useOddsContext } from "@/app/context/OddsContext";
+import { useOddsContext } from "@/app/context/OddsContext"
 
 export default function SportsFilter() {
   const {
@@ -7,13 +7,13 @@ export default function SportsFilter() {
     setSelectedSport,
     favoriteSports,
     toggleFavoriteSport,
-  } = useOddsContext();
+  } = useOddsContext()
 
   return (
     <div className="flex flex-wrap gap-2 mt-4 mb-6">
       {allSports.map(({ group }) => {
-        const isFavorite = favoriteSports.includes(group);
-        const isSelected = selectedSport === group;
+        const isFavorite = favoriteSports.includes(group)
+        const isSelected = selectedSport === group
 
         return (
           <div key={group} className="flex items-center gap-1">
@@ -34,7 +34,7 @@ export default function SportsFilter() {
               {isFavorite ? '⭐' : '☆'}
             </button>
           </div>
-        );
+        )
       })}
 
       {selectedSport && (
@@ -46,5 +46,5 @@ export default function SportsFilter() {
         </button>
       )}
     </div>
-  );
+  )
 }

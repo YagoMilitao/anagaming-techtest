@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { Session } from "next-auth";
+import { Session } from "next-auth"
 
 export default function UserPanel({ session }: { session: Session }) {
   return (
@@ -9,5 +9,5 @@ export default function UserPanel({ session }: { session: Session }) {
         Bem-vindo, <strong>{session?.user?.name}</strong>
       </p>
     </div>
-  );
+  )
 }
