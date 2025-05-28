@@ -1,6 +1,5 @@
 import React from "react";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import ClientHomePage from "./components/ClientHomePage";
 import { FilterProvider } from "./context/FilterContext";
 import { authOptions } from "@/lib/authOptions";
