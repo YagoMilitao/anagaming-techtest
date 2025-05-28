@@ -7,7 +7,6 @@ import { formatDate } from '@/utils/formatDate'
 import { getBestH2HOutcome } from '@/app/viewmodels/oddsListViewModel'
 import { useOddsListState } from '@/state/oddsListState'
 import { OddData } from '@/data/Odd'
-
 import {
   DndContext,
   closestCenter,
