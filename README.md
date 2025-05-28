@@ -80,19 +80,83 @@ Após o login, você será redirecionado à **home**, que exibe:
 
 ---
 
-## 🛠️ Como rodar localmente
+Ao iniciar o projeto localmente, siga este passo a passo:
+
+1. **Acesse a aplicação** (em `http://localhost:3000`).
+2. **Faça login com GitHub**.
+3. **Visualize os jogos na Home**, separados em "Ao Vivo", "Futuros" e "Encerrados".
+4. **Os melhores valores de odds** estarão destacados em **verde**, enquanto os piores em **azul**.
+5. **Clique no botão de filtro no topo da lista** para escolher os esportes de seu interesse.
+6. **Esses filtros são salvos** como favoritos e carregados automaticamente em acessos futuros.
+
+A plataforma é intuitiva e reativa, feita para facilitar a análise rápida de apostas.
+
+---
+
+### 🔎 Como obter essas variáveis
+
+#### 🔗 `GITHUB_ID` e `GITHUB_SECRET`
+
+1. Vá para [GitHub Developer Settings](https://github.com/settings/developers).
+2. Clique em **"OAuth Apps"** > **"New OAuth App"**.
+3. Preencha:
+   - **Application Name**: `ANA Gaming App`
+   - **Homepage URL**: `http://localhost:3000`
+   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
+4. Copie o **Client ID** e **Client Secret** gerados.
+
+#### 🔑 `NEXTAUTH_SECRET`
+
+Você pode gerar uma chave segura com o seguinte comando:
 
 ```bash
-# Clone o repositório
+openssl rand -base64 32
+```
+
+#### 🔐 `ODDS_API_KEY` e `NEXT_PUBLIC_ODDS_API_KEY`
+
+1. Acesse [The Odds API](https://the-odds-api.com/).
+2. Crie uma conta gratuita.
+3. Copie sua chave da API.
+4. Use a mesma chave nos campos `ODDS_API_KEY` e `NEXT_PUBLIC_ODDS_API_KEY`.
+
+> ⚠️ **Importante:** `NEXT_PUBLIC_ODDS_API_KEY` deve obrigatoriamente começar com `NEXT_PUBLIC_` para que esteja disponível no frontend com Next.js.
+
+---
+
+### ▶️ Como rodar o projeto localmente
+
+#### 1. Clone o repositório:
+
+```bash
 git clone https://github.com/YagoMilitao/anagaming-techtest.git
+```
 
-# Acesse a pasta
-cd anagaming-techtest
+#### 2. Instale as dependências:
 
-# Instale as dependências
+```bash
 npm install
+```
 
-# Configure variáveis de ambiente (veja .env.example)
+#### 3. Configure o `.env.local`
 
-# Rode o projeto em modo desenvolvimento
+Crie um arquivo `.env.local` na raiz do projeto e preencha com as variáveis que você obteve anteriormente:
+
+```env
+GITHUB_ID=xxx
+GITHUB_SECRET=xxx
+NEXTAUTH_SECRET=xxx
+NEXTAUTH_URL=http://localhost:3000
+ODDS_API_KEY=xxx
+NEXT_PUBLIC_ODDS_API_KEY=xxx
+```
+
+#### 4. Inicie o servidor de desenvolvimento:
+
+```bash
 npm run dev
+```
+
+---
+
+💡 Projeto desenvolvido por [Yago Militão](https://github.com/YagoMilitao)
