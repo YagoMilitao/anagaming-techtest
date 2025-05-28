@@ -1,42 +1,39 @@
-// src/app/sports/[sport]/[id]/page.tsx
 
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa'; // Ícones
-
 import { OddDetailPageState } from '@/state/OddDetailPageState'; // Importe a classe de estado
 import { OddDetailPageViewModel } from '@/app/viewmodels/OddDetailPageViewModel';
- // Importe a classe ViewModel
+import OddsSkeleton from '@/app/components/OddsSkeleton';
+ 
 
 export default function OddDetailPage() {
   const params = useParams();
-  const sportKey = params?.sport as string; // 'sport' do seu path dinâmico
-  const oddId = params?.id as string; // 'id' do seu path dinâmico
+  const sportKey = params?.sport as string; 
+  const oddId = params?.id as string; 
+  const isLoading :boolean = false
 
-  // 1. Crie uma única instância da classe de estado
-  // A instância é criada apenas uma vez quando o componente é montado.
+  
   const [state] = useState(() => new OddDetailPageState(sportKey, oddId));
 
-  // 2. Carrega os detalhes da odd quando o componente monta ou quando sportKey/oddId mudam
-  // A dependência em 'state' garante que o efeito seja executado quando a instância do estado estiver pronta.
-  // As dependências 'sportKey' e 'oddId' garantem que a busca seja re-executada se a URL mudar.
+  
   useEffect(() => {
     state.loadOddDetails();
-  }, [state, sportKey, oddId]); // Adicione sportKey e oddId como dependências
+  }, [state, sportKey, oddId]);
 
-  // 3. Crie o ViewModel a partir do estado.
-  // O ViewModel é recriado a cada renderização do componente.
-  // Isso garante que os dados exibidos na UI (via ViewModel) sempre reflitam
-  // o estado mais recente da classe OddDetailPageState.
+  
   const viewModel = new OddDetailPageViewModel(state);
-  const displayData = viewModel.getDisplayData(); // Obtenha os dados prontos para exibição
+  const displayData = viewModel.getDisplayData(); 
 
-  // 4. Lógica de renderização baseada no estado do ViewModel
-  if (displayData.isLoading) {
-    return <div className="p-6 text-center text-xl">Carregando detalhes da odd...</div>;
+  if (displayData.isLoading ) {
+    return <OddsSkeleton />;
   }
+
+  // if (displayData.isLoading) {
+  //   return <div className="p-6 text-center text-xl">Carregando detalhes da odd...</div>;
+  // }
 
   if (displayData.hasError) {
     return (
@@ -56,7 +53,6 @@ export default function OddDetailPage() {
     return <div className="p-6 text-center text-gray-700 text-xl">Odd não encontrada.</div>;
   }
 
-  // 5. Renderiza a UI usando os dados do ViewModel
   return (
     <main className="p-6 max-w-5xl mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -78,9 +74,9 @@ export default function OddDetailPage() {
         <h2 className="text-xl font-semibold mb-2">Odds</h2>
         {displayData.bookmakers.map((bookmaker) => (
           <div key={bookmaker.key} className="mb-4 border p-4 rounded-md">
-            <h3 className="text-lg font-medium mb-2">{bookmaker.title}</h3> {/* Usar bookmaker.title */}
+            <h3 className="text-lg font-medium mb-2">{bookmaker.title}</h3> 
             {bookmaker.markets.map((market, index) => (
-              <div key={market.key || index} className="flex flex-wrap gap-4 mt-2"> {/* Usar market.key ou index */}
+              <div key={market.key || index} className="flex flex-wrap gap-4 mt-2"> 
                 <span className="font-semibold text-gray-700">{market.key.toUpperCase()}:</span>
                 {market.outcomes.map((outcome, idx) => (
                   <div key={outcome.name || idx} className="bg-gray-100 p-2 rounded-md border border-gray-200">
