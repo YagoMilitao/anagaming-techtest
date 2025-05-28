@@ -13,9 +13,7 @@ export const authOptions = {
   callbacks: {
     
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      // Permite URLs relativas
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Permite URLs no mesmo domínio
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
