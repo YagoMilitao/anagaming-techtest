@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useSession } from 'next-auth/react';
-import HomeClient from '@/app/components/HomeClient';
+import HomeClient from '@/app/components/User/HomeClient';
 
 // Mock next-auth's useSession
 jest.mock('next-auth/react');

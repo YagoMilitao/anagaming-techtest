@@ -3,7 +3,7 @@
 import { useSession, signIn } from 'next-auth/react'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import OddsSkeleton from './OddsSkeleton'
+import OddsSkeleton from '../OddsSkeleton'
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { status } = useSession()

@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import LoginButton from './LoginButton'
-import OddsSkeleton from './OddsSkeleton'
+import OddsSkeleton from '../OddsSkeleton'
 
 export default function HomeClient() {
   const { data: session, status } = useSession()

@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 
 import { Session } from "next-auth";
-import UserPanel from "@/app/components/UserPanel";
+import UserPanel from "@/app/components/User/UserPanel";
 
 describe("UserPanel", () => {
     it("renders the user's name when session is provided", () => {

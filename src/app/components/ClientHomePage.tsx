@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { fetchOddsData } from "../lib/fetchOdds"
 import { useOddsContext } from "../context/OddsContext"
-import UserPanel from "./UserPanel"
+import UserPanel from "./User/UserPanel"
 import DropdownAccordion from "./DropdownAccordion"
 import SportsFilter from "./Filters/SportsFilter"
 import { Session } from "next-auth"

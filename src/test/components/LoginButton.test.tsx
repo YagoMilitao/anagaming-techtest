@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { signIn } from 'next-auth/react';
-import LoginButton from '@/app/components/LoginButton';
+import LoginButton from '@/app/components/User/LoginButton';
 
 jest.mock('next-auth/react', () => ({
     signIn: jest.fn(),

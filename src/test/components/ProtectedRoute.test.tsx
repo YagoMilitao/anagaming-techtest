@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { useSession, signIn } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import ProtectedRoute from '@/app/components/ProtectedRoute'
+import ProtectedRoute from '@/app/components/Session/ProtectedRoute'
 
 // Mock next-auth and next/navigation hooks
 jest.mock('next-auth/react')

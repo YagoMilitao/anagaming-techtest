@@ -31,7 +31,7 @@ describe('OddDetailPage', () => {
         jest.resetAllMocks()
         global.fetch = jest.fn().mockResolvedValue({
             json: jest.fn().mockResolvedValue(mockOdd),
-        } as any)
+        } as unknown)
     })
 
     it('renders loading state initially', () => {

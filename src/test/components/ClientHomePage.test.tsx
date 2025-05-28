@@ -1,135 +1,269 @@
-import React from "react"
-import { render, screen, waitFor, fireEvent } from "@testing-library/react"
-import ClientHomePage from "@/app/components/ClientHomePage"
-import { useOddsContext } from "@/app/context/OddsContext"
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import ClientHomePage from '@/app/components/ClientHomePage';
+import { OddData } from '@/data/Odd';
 
 
-// Mock child components
-jest.mock("../../../app/components/UserPanel", () => () => <div data-testid="user-panel" />)
-jest.mock("../../../app/components/Odds/OddsList", () => ({ odds }: any) => (
-    <div data-testid="odds-list">{odds.length} odds</div>
-))
-jest.mock("../../../app/components/DropdownAccordion", () => ({ children, title, count, status }: any) => (
-    <div data-testid={`dropdown-${status}`}>
-        <div>{title}</div>
-        <div data-testid={`count-${status}`}>{count}</div>
-        {children}
-    </div>
-))
-jest.mock("../../../app/components/Filters/SportsFilter", () => () => <div data-testid="sports-filter" />)
+// Mock do contexto de OddsContext
+const mockOddsContext = {
+  selectedSport: '',
+  favoriteSports: [],
+  toggleFavoriteSport: jest.fn(),
+  allSports: [
+    { group: 'Futebol', keys: ['soccer_epl', 'soccer_laliga'] },
+    { group: 'Basquete', keys: ['basketball_nba'] },
+  ],
+};
+jest.mock('../context/OddsContext', () => ({
+  useOddsContext: () => mockOddsContext,
+}));
 
-// Mock context
-const mockUseOddsContext = useOddsContext as jest.Mock
-jest.mock("../../../app/context/OddsContext", () => ({
-    useOddsContext: jest.fn(),
-}))
+// Mock da função fetchOddsData
+const mockFetchOddsData = jest.fn();
+jest.mock('../lib/fetchOdds', () => ({
+  fetchOddsData: () => mockFetchOddsData(),
+}));
 
-const mockSession = { user: { name: "Test User" }, expires: new Date(Date.now() + 60 * 60 * 1000).toISOString() }
+// Mock do componente OddsSkeleton
+const MockOddsSkeleton = () => <div data-testid="odds-skeleton">Carregando Odds...</div>;
+MockOddsSkeleton.displayName = 'MockOddsSkeleton';
+jest.mock('./OddsSkeleton', () => MockOddsSkeleton);
 
-const now = Date.now()
-const threeHours = 3 * 60 * 60 * 1000
+// Mock do componente OddsList
+const MockOddsList = ({ odds }: { odds: OddData[] }) => (
+  <div data-testid="odds-list">
+    {odds.map((odd) => (
+      <div key={odd.id} data-testid={`odd-item-${odd.id}`}>
+        {odd.home_team} vs {odd.away_team}
+      </div>
+    ))}
+  </div>
+);
+MockOddsList.displayName = 'MockOddsList';
+jest.mock('./Odds/OddsList', () => MockOddsList);
 
-const mockOdds = [
-    // Live game
-    {
-        id: "1",
-        sport_key: "soccer",
-        commence_time: new Date(now - 1000 * 60).toISOString(),
+// Mock do componente UserPanel
+const MockUserPanel = ({ session }: { session: any }) => (
+  <div data-testid="user-panel">User Panel - {session?.user?.name}</div>
+);
+MockUserPanel.displayName = 'MockUserPanel';
+jest.mock('./User/UserPanel', () => MockUserPanel);
+
+// Mock do componente SportsFilter
+const MockSportsFilter = () => <div data-testid="sports-filter">Filtro de Esportes</div>;
+MockSportsFilter.displayName = 'MockSportsFilter';
+jest.mock('./Filters/SportsFilter', () => MockSportsFilter);
+
+// Mock do componente DropdownAccordion
+const MockDropdownAccordion = ({ title, children, count, status }: { title: React.ReactNode; children: React.ReactNode; count?: number; status?: string }) => (
+  <div data-testid={`dropdown-accordion-${status}`}>
+    {title} ({count})
+    <div>{children}</div>
+  </div>
+);
+MockDropdownAccordion.displayName = 'MockDropdownAccordion';
+jest.mock('./DropdownAccordion', () => MockDropdownAccordion);
+
+describe('ClientHomePage', () => {
+  const mockSession = {
+    user: {
+      name: 'Test User',
+      email: 'test@example.com',
+      image: 'url',
     },
-    // Future game
-    {
-        id: "2",
-        sport_key: "soccer",
-        commence_time: new Date(now + threeHours).toISOString(),
-    },
-    // Finished game
-    {
-        id: "3",
-        sport_key: "soccer",
-        commence_time: new Date(now - threeHours - 1000 * 60).toISOString(),
-    },
-]
+    expires: 'some date',
+  };
 
-describe("ClientHomePage", () => {
+  const mockOddsData: OddData[] = [
+    {
+      id: '1',
+      sport_title: 'Futebol',
+      commence_time: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // Jogo ao vivo (começou há 1 hora)
+      home_team: 'Time A',
+      away_team: 'Time B',
+      bookmakers: [],
+      eventId: '1',
+      sport: 'soccer',
+      status: 'live',
+      sport_key: 'soccer_epl',
+    },
+    {
+      id: '2',
+      sport_title: 'Basquete',
+      commence_time: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // Jogo futuro (começa em 1 hora)
+      home_team: 'Time C',
+      away_team: 'Time D',
+      bookmakers: [],
+      eventId: '2',
+      sport: 'basketball',
+      status: 'future',
+      sport_key: 'basketball_nba',
+    },
+    {
+      id: '3',
+      sport_title: 'Futebol',
+      commence_time: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // Jogo finalizado (terminou há 1 hora)
+      home_team: 'Time E',
+      away_team: 'Time F',
+      bookmakers: [],
+      eventId: '3',
+      sport: 'soccer',
+      status: 'finished',
+      sport_key: 'soccer_laliga',
+    },
+  ] as OddData[];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('GIVEN the component is loading', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        // Default context mock
-        (useOddsContext as jest.Mock).mockReturnValue({
-            selectedSport: "Soccer",
-            favoriteSports: [],
-            toggleFavoriteSport: jest.fn(),
-            allSports: [
-                { group: "Soccer", keys: ["soccer"] },
-                { group: "Basketball", keys: ["basketball"] },
-            ],
-        })
-        // Default fetchOddsData mock
-        jest.spyOn(Date, "now").mockImplementation(() => now)
-    })
+      mockFetchOddsData.mockResolvedValue([]);
+    });
 
-    it("renders loading state initially", async () => {
-        render(<ClientHomePage session={mockSession} />)
-        expect(screen.getByText(/Carregando/i)).toBeInTheDocument()
-        await waitFor(() => expect(screen.queryByText(/Carregando/i)).not.toBeInTheDocument())
-    })
+    it('WHEN the component mounts THEN it should display the OddsSkeleton', () => {
+      render(<ClientHomePage session={mockSession as any} />);
+      expect(screen.getByTestId('odds-skeleton')).toBeInTheDocument();
+    });
+  });
 
-    it("renders UserPanel and SportsFilter", async () => {
-        render(<ClientHomePage session={mockSession} />)
-        await waitFor(() => expect(screen.getByTestId("user-panel")).toBeInTheDocument())
-        expect(screen.getByTestId("sports-filter")).toBeInTheDocument()
-    })
+  describe('GIVEN the odds data is successfully fetched', () => {
+    beforeEach(() => {
+      mockFetchOddsData.mockResolvedValue(mockOddsData);
+    });
 
-    it("renders odds in correct categories", async () => {
-        render(<ClientHomePage session={mockSession} />)
+    describe('WHEN the component mounts and data loads', () => {
+      it('THEN it should display the UserPanel', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('user-panel')).toBeInTheDocument());
+      });
+
+      it('THEN it should display the SportsFilter', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('sports-filter')).toBeInTheDocument());
+      });
+
+      it('THEN it should display the "Jogos Ao Vivo" DropdownAccordion with live games', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('dropdown-accordion-live')).toHaveTextContent('Jogos Ao Vivo (1)'));
+        expect(screen.getByTestId('odds-list')).toHaveTextContent('Time A vs Time B');
+      });
+
+      it('THEN it should display the "Jogos Futuros" DropdownAccordion with future games', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('dropdown-accordion-future')).toHaveTextContent('Jogos Futuros (1)'));
+        expect(screen.getByTestId('odds-list')).toHaveTextContent('Time C vs Time D');
+      });
+
+      it('THEN it should display the "Jogos Encerrados" DropdownAccordion with finished games', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('dropdown-accordion-finished')).toHaveTextContent('Jogos Encerrados (1)'));
+        expect(screen.getByTestId('odds-list')).toHaveTextContent('Time E vs Time F');
+      });
+    });
+  });
+
+  describe('GIVEN the odds data fetch returns an error', () => {
+    beforeEach(() => {
+      mockFetchOddsData.mockRejectedValue(new Error('Failed to fetch odds'));
+    });
+
+    describe('WHEN the component mounts and data loading fails', () => {
+      it('THEN it should not display the odds lists', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.queryByTestId('odds-list')).toBeNull());
+        // You might want to add an error message display in the component for a better test
+      });
+
+      it('THEN it should not be loading', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.queryByTestId('odds-skeleton')).toBeNull());
+      });
+    });
+  });
+
+  describe('GIVEN a sport is selected in the context', () => {
+    beforeEach(() => {
+      (mockOddsContext as any).selectedSport = 'Futebol'; // Type assertion para permitir a modificação
+      mockFetchOddsData.mockResolvedValue(mockOddsData);
+    });
+
+    describe('WHEN the component mounts', () => {
+      it('THEN it should filter the odds based on the selected sport', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
         await waitFor(() => {
-            expect(screen.getByTestId("dropdown-live")).toBeInTheDocument()
-            expect(screen.getByTestId("dropdown-future")).toBeInTheDocument()
-            expect(screen.getByTestId("dropdown-finished")).toBeInTheDocument()
-        })
-
-        expect(screen.getByTestId("count-live")).toHaveTextContent("1")
-        expect(screen.getByTestId("count-future")).toHaveTextContent("1")
-        expect(screen.getByTestId("count-finished")).toHaveTextContent("1")
-    })
-
-    it("filters odds by selected sport", async () => {
-        (useOddsContext as jest.Mock).mockReturnValue({
-            selectedSport: "Basketball",
-            favoriteSports: [],
-            toggleFavoriteSport: jest.fn(),
-            allSports: [
-                { group: "Soccer", keys: ["soccer"] },
-                { group: "Basketball", keys: ["basketball"] },
-            ],
-        })
-        render(<ClientHomePage session={mockSession} />)
-        await waitFor(() => {
-            expect(screen.getByTestId("dropdown-live")).toBeInTheDocument()
-        })
-        // No basketball odds in mockOdds
-        expect(screen.getByTestId("count-live")).toHaveTextContent("0")
-        expect(screen.getByTestId("count-future")).toHaveTextContent("0")
-        expect(screen.getByTestId("count-finished")).toHaveTextContent("0")
-    })
-
-    it("shows clear favorites button when favoriteSports is not empty and triggers toggleFavoriteSport", async () => {
-        const toggleFavoriteSport: jest.Mock = jest.fn();
-        (useOddsContext as jest.Mock).mockReturnValue({
-            selectedSport: "Soccer",
-            favoriteSports: ["soccer", "basketball"],
-            toggleFavoriteSport: toggleFavoriteSport,
-            allSports: [
-                { group: "Soccer", keys: ["soccer"] },
-                { group: "Basketball", keys: ["basketball"] },
-            ],
+          expect(screen.getByTestId('dropdown-accordion-live')).toHaveTextContent('Jogos Ao Vivo (1)');
+          expect(screen.getByTestId('dropdown-accordion-future')).toHaveTextContent('Jogos Futuros (0)');
+          expect(screen.getByTestId('dropdown-accordion-finished')).toHaveTextContent('Jogos Encerrados (1)');
+          expect(screen.getByTestId('odds-list')).toHaveTextContent('Time A vs Time B');
+          expect(screen.getByTestId('odds-list')).not.toHaveTextContent('Time C vs Time D');
+          expect(screen.getByTestId('odds-list')).toHaveTextContent('Time E vs Time F');
         });
-        render(<ClientHomePage session={mockSession} />);
-        await waitFor(() => {
-            expect(screen.getByRole("button", { name: /Limpar categorias favoritas/i })).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('GIVEN favorite sports exist in the context', () => {
+    beforeEach(() => {
+      (mockOddsContext as any).favoriteSports = ['Futebol']; // Type assertion para permitir a modificação
+      mockFetchOddsData.mockResolvedValue(mockOddsData);
+    });
+
+    describe('WHEN the component renders', () => {
+      it('THEN it should display the "Limpar categorias favoritas" button', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Limpar categorias favoritas' })).toBeInTheDocument());
+      });
+
+      describe('WHEN the "Limpar categorias favoritas" button is clicked', () => {
+        it('THEN it should call toggleFavoriteSport for each favorite sport', async () => {
+          render(<ClientHomePage session={mockSession as any} />);
+          await waitFor(() => screen.getByRole('button', { name: 'Limpar categorias favoritas' }).click());
+          expect(mockOddsContext.toggleFavoriteSport).toHaveBeenCalledWith('Futebol');
         });
-        fireEvent.click(screen.getByRole("button", { name: /Limpar categorias favoritas/i }));
-        expect(toggleFavoriteSport).toHaveBeenCalledTimes(2);
-        expect(toggleFavoriteSport).toHaveBeenCalledWith("soccer");
-        expect(toggleFavoriteSport).toHaveBeenCalledWith("basketball");
-    })
-})
+      });
+    });
+
+    describe('WHEN favoriteSports is an empty array', () => {
+      beforeEach(() => {
+        (mockOddsContext as any).favoriteSports = []; // Type assertion para permitir a modificação
+        mockFetchOddsData.mockResolvedValue(mockOddsData);
+      });
+
+      it('THEN it should not display the "Limpar categorias favoritas" button', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.queryByRole('button', { name: 'Limpar categorias favoritas' })).toBeNull());
+      });
+    });
+  });
+
+  describe('GIVEN odds data with invalid commence_time', () => {
+    const invalidDateOdds: OddData[] = [
+      {
+        id: '4',
+        sport_title: 'Futebol',
+        commence_time: 'invalid-date',
+        home_team: 'Time G',
+        away_team: 'Time H',
+        bookmakers: [],
+        eventId: '4',
+        sport: 'soccer',
+        status: 'live',
+        sport_key: 'soccer_epl',
+      },
+    ] as OddData[];
+
+    beforeEach(() => {
+      mockFetchOddsData.mockResolvedValue(invalidDateOdds);
+    });
+
+    describe('WHEN the component mounts', () => {
+      it('THEN it should not throw an error due to invalid date', async () => {
+        render(<ClientHomePage session={mockSession as any} />);
+        await waitFor(() => expect(screen.getByTestId('dropdown-accordion-live')).toHaveTextContent('Jogos Ao Vivo (0)'));
+        // Check console warnings (you might need to mock console.warn for a more robust test)
+      });
+    });
+  });
+});

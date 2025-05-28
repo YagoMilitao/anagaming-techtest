@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import SessionProviderWrapper from '@/app/components/SessionProviderWrapper';
+import SessionProviderWrapper from '@/app/components/Session/SessionProviderWrapper';
 
 
 jest.mock('next-auth/react', () => ({

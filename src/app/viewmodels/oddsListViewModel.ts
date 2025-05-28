@@ -1,5 +1,6 @@
 import { OddData } from "@/data/Odd"
 
+
 export function getBestH2HOutcome(
   bookmakers: OddData['bookmakers'],
   odd: OddData
