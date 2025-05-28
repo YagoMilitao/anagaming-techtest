@@ -1,6 +1,6 @@
 # 🎯 ANA Gaming - Plataforma de Apostas Esportivas
 
-Esta é uma plataforma de visualização de apostas esportivas desenvolvida como parte de um desafio técnico para vaga de Desenvolvedor Front-End Pleno na **ANA Gaming**.
+Esta é uma plataforma de visualização de apostas esportivas 
 
 A aplicação permite que usuários visualizem jogos ao vivo, futuros e passados com as melhores odds disponíveis, utilizando autenticação e diversas tecnologias modernas.
 
