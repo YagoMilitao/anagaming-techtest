@@ -39,3 +39,20 @@ export type SportGroup ={
 }
 
 
+export type OddDetail = {
+  id: string;
+  sport_title: string;
+  commence_time: string;
+  home_team: string;
+  away_team: string;
+  league_name: string;
+  bookmakers: {
+    key: string;
+    markets: {
+      outcomes: {
+        name: string;
+        price: number;
+      }[];
+    }[];
+  }[];
+};

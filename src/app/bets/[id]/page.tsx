@@ -3,24 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa';
+import { OddDetail } from '@/data/Odd';
 
-type OddDetail = {
-  id: string;
-  sport_title: string;
-  commence_time: string;
-  home_team: string;
-  away_team: string;
-  league_name: string;
-  bookmakers: {
-    key: string;
-    markets: {
-      outcomes: {
-        name: string;
-        price: number;
-      }[];
-    }[];
-  }[];
-};
+
 
 export default function OddDetailPage() {
   const { id } = useParams();

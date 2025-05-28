@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import LoginButton from './LoginButton';
-import LogoutButton from './LogoutButton';
+
 import Link from 'next/link';
 
 export default function HomeClient() {
@@ -15,14 +15,6 @@ export default function HomeClient() {
       {session ? (
         <>
           <p className="text-xl">Bem-vindo, {session.user?.name}!</p>
-          <div className="flex gap-4">
-            <Link href="/dashboard">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Ir para o Dashboard
-              </button>
-            </Link>
-            <LogoutButton />
-          </div>
         </>
       ) : (
         <LoginButton />

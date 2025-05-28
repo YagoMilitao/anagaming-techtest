@@ -5,12 +5,8 @@ import { fetchOddsData } from "../lib/fetchOdds";
 import { useOddsContext } from "../context/OddsContext";
 import UserPanel from "./UserPanel";
 import OddsList from "./Odds/OddsList";
-import FilterBar from "./Filters/FilterBar";
-import OddsFilter from "./Odds/OddsFilter";
 import DropdownAccordion from "./DropdownAccordion";
 import { orderBy } from "lodash";
-import StatusDot from "./StatusDot";
-import ChampionshipFilter from "./Filters/ChampionshipFilter";
 import SportsFilter from "./Filters/SportsFilter";
 
 export default function ClientHomePage({ session }: { session: any }) {

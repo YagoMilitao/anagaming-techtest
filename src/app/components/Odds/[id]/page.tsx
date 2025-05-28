@@ -14,7 +14,6 @@ export default async function OddsDetailPage({ params }: { params: { id: string 
   }
 
   const odds = await fetchOddsData();
-  // Replace 'OddType' with the actual type of your odds objects if you have one
   const odd = odds.find((o: any) => o.id === params.id);
 
   if (!odd) {
