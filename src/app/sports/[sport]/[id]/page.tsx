@@ -1,13 +1,15 @@
 import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa'
 import { fetchOddById } from '@/app/lib/fetchOdds'
 import { OddData } from '@/data/Odd'
-interface OddDetailPagePropsPageProps {
+import { PageProps } from 'next/types'
+interface OddDetailPageProps extends PageProps { // Nome da interface corrigido
   params: {
     sport: string;
     id: string;
   };
 }
-export default async function OddDetailPage({params}: OddDetailPagePropsPageProps) {
+
+export default async function OddDetailPage({ params }: OddDetailPageProps) { // Use a interface corrigida
   const { sport, id } = params 
 
   const odd: OddData | null = await fetchOddById(sport, id)
