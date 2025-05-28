@@ -1,8 +1,13 @@
 import { FaCalendarAlt, FaClock, FaTrophy } from 'react-icons/fa'
 import { fetchOddById } from '@/app/lib/fetchOdds'
 import { OddData } from '@/data/Odd'
-
-export default async function OddDetailPage({ params }: { params: { sport: string;id: string } }) {
+interface OddDetailPagePropsPageProps {
+  params: {
+    sport: string;
+    id: string;
+  };
+}
+export default async function OddDetailPage({params}: OddDetailPagePropsPageProps) {
   const { sport, id } = params 
 
   const odd: OddData | null = await fetchOddById(sport, id)
