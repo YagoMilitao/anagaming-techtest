@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎯 ANA Gaming - Plataforma de Apostas Esportivas
 
-## Getting Started
+Esta é uma plataforma de visualização de apostas esportivas desenvolvida como parte de um desafio técnico para vaga de Desenvolvedor Front-End Pleno na **ANA Gaming**.
 
-First, run the development server:
+A aplicação permite que usuários visualizem jogos ao vivo, futuros e passados com as melhores odds disponíveis, utilizando autenticação e diversas tecnologias modernas.
+
+---
+
+## 🚀 Deploy
+
+🔗 Acesse a aplicação em produção:
+
+**[https://anagaming-techtest.vercel.app/](https://anagaming-techtest.vercel.app/)**
+
+---
+
+## 🧭 Onboarding: Como Usar a Plataforma ANA Gaming
+
+Bem-vindo à plataforma de visualização de apostas esportivas da **ANA Gaming**! Abaixo está um guia completo para te ajudar a começar do zero e entender todas as funcionalidades disponíveis.
+
+### ✅ 1. Acessando a Plataforma
+
+Você pode acessar a aplicação hospedada na Vercel pelo seguinte link:
+
+
+---
+
+### 🧑‍💻 2. Autenticação
+
+Ao acessar a plataforma, você será direcionado para a **página de login**. A autenticação é feita via:
+
+- Google
+- GitHub (ou outro provedor configurado)
+  
+🔒 **Importante:** Algumas funcionalidades são **restritas a usuários autenticados**. Certifique-se de estar logado para ter acesso completo.
+
+---
+
+### 🏠 3. Página Inicial
+
+Após o login, você será redirecionado à **home**, que exibe:
+
+- Uma lista de **eventos esportivos** recuperados da [The Odds API](https://the-odds-api.com/)
+- Separação clara entre:
+  - **Jogos ao vivo**
+  - **Jogos futuros**
+  - **Jogos passados** (em cinza)
+
+---
+
+### 🧩 4. Funcionalidades da Plataforma
+
+#### 📈 Visualização de Odds
+- Cada evento exibe as **melhores odds para os times em disputa**.
+- As **odds mais altas** são destacadas em **verde**, para facilitar a comparação.
+
+#### 🔍 Filtros Personalizados
+- Utilize os **filtros na parte superior da página** para personalizar sua experiência:
+  - Filtrar por esporte (ex: futebol, basquete, etc.)
+- Os filtros são gerenciados com `Context API`, garantindo fluidez na interação.
+
+#### ⭐ Categorias Favoritas (Em desenvolvimento)
+- Possibilidade de selecionar e salvar suas **categorias favoritas** para uma navegação mais rápida e personalizada.
+- As preferências serão persistidas via API própria da plataforma.
+
+---
+
+## 🧪 Tecnologias Utilizadas
+
+| Camada         | Tecnologia                      |
+|----------------|----------------------------------|
+| Frontend       | Next.js 15 (App Router)          |
+| Estilo         | TailwindCSS                     |
+| Animações      | Framer Motion                   |
+| Autenticação   | NextAuth                        |
+| SSR e SSG      | Sim (Web Fetch API + RSC)       |
+| Gerenciamento  | Context API                     |
+| Persistência   | API backend própria              |
+| Deploy         | Vercel                          |
+
+---
+
+## 🛠️ Como rodar localmente
 
 ```bash
+# Clone o repositório
+git clone https://github.com/YagoMilitao/anagaming-techtest.git
+
+# Acesse a pasta
+cd anagaming-techtest
+
+# Instale as dependências
+npm install
+
+# Configure variáveis de ambiente (veja .env.example)
+
+# Rode o projeto em modo desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
