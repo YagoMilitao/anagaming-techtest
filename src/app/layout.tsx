@@ -1,6 +1,6 @@
+import './globals.css';
 import Link from "next/link";
 import { OddsProvider } from "./context/OddsContext";
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
              </h1>
              <nav className="space-x-4">
+              
                <Link href="/api/auth/signout">Logout</Link>
              </nav>
            </header>
