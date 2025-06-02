@@ -1,5 +1,5 @@
-import { Bookmaker, Market, Outcome } from "@/data/Odd";
-
+import { Bookmaker, Outcome } from "@/data/Odd";
+import _ from "lodash";
 export interface BestOutcomeDetail {
   name: string;
   price: number;
@@ -7,40 +7,47 @@ export interface BestOutcomeDetail {
 }
 
 /**
- * Esta função recebe um array de casas de apostas (bookmakers) e retorna as melhores odds
- * (preços) para cada nome de resultado (outcome name) único no mercado "h2h" (Head-to-Head).
- *
- * Ele filtra os bookmakers para encontrar o mercado "h2h" e coleta todos os resultados (outcomes)
- * desse mercado. Em seguida, encontra o preço máximo para cada nome de resultado único
- * e retorna um array desses resultados com as melhores odds.
- *
- * @param {Bookmaker[] | undefined} bookmakers - Um array de bookmakers ou undefined.
- * @returns {Outcome[]} Um array de resultados com as melhores odds para cada nome de resultado único.
- */
-/**
  * Encontra a melhor odd (preço mais alto) para cada outcome distinto
  * dentro do mercado 'h2h' (Head-to-Head) de todos os bookmakers.
  * @param bookmakers O array de bookmakers de um evento.
  * @returns Um array de objetos com o nome do outcome, o melhor preço e o nome do bookmaker.
  */
 export function getBestOdds(bookmakers: Bookmaker[]): BestOutcomeDetail[] {
-  const bestOutcomesMap = new Map<string, BestOutcomeDetail>();
+  const h2hMarkets = _.flatMap(bookmakers, (bookmaker) =>
+    _.filter(bookmaker.markets, { key: "h2h" })
+  );
 
-  bookmakers.forEach((bookmaker) => {
-    const h2hMarket = bookmaker.markets.find((market: Market) => market.key === "h2h");
+  if (_.isEmpty(h2hMarkets)) {
+    return [];
+  }
 
-    if (h2hMarket) {
-      h2hMarket.outcomes.forEach((outcome: Outcome) => {
-        if (!bestOutcomesMap.has(outcome.name) || outcome.price > bestOutcomesMap.get(outcome.name)!.price) {
-          bestOutcomesMap.set(outcome.name, {
-            name: outcome.name,
-            price: outcome.price,
-            bookmakerName: bookmaker.title,
-          });
-        }
+  const allOutcomes: (Outcome & { bookmakerName: string })[] = _.flatMap(
+    h2hMarkets,
+    (market) => {
+      const parentBookmaker = _.find(bookmakers, (bm) =>
+        _.some(bm.markets, (m) => m === market)
+      );
+      return _.map(market.outcomes, (outcome) => ({
+        ...outcome,
+        bookmakerName: parentBookmaker ? parentBookmaker.title : "Unknown",
+      }));
+    }
+  );
+  
+  const groupedOutcomes = _.groupBy(allOutcomes, "name");
+  const bestOutcomes: BestOutcomeDetail[] = [];
+
+  _.forOwn(groupedOutcomes, (outcomesForName, _outcomeName) => {
+    const bestOutcome = _.maxBy(outcomesForName, "price");
+
+    if (bestOutcome) {
+      bestOutcomes.push({
+        name: bestOutcome.name,
+        price: bestOutcome.price,
+        bookmakerName: bestOutcome.bookmakerName,
       });
     }
   });
 
-  return Array.from(bestOutcomesMap.values());
+  return bestOutcomes;
 }
