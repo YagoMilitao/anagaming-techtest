@@ -1,12 +1,14 @@
 import { MetadataRoute } from "next";
-import { fetchOddsData } from "@/app/lib/fetchOdds";
+import { fetchOddsForSitemap } from "@/app/lib/fetchOdds";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://anagaming-techtest.vercel.app";
 
   const staticPages = [{ url: baseUrl, lastModified: new Date(), changeFrequency: "daily" as const, priority: 1.0 }];
 
-  const fetchResult = await fetchOddsData();
+  const fetchResult = await fetchOddsForSitemap();
   const odds = fetchResult.data || [];
+
   const dynamicEventPages = odds.map((odd) => {
     const formattedSportKey = odd.sport_key.replace(/_/g, "-");
     return {
@@ -16,7 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     };
   });
-
   const uniqueSportKeys = [...new Set(odds.map((odd) => odd.sport_key))];
   const dynamicSportPages = uniqueSportKeys.map((sportKey) => ({
     url: `${baseUrl}/sports/${sportKey.replace(/_/g, "-")}`,

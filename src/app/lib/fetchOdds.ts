@@ -19,7 +19,7 @@ export async function fetchOddsData(): Promise<{ data: Odd[]; error?: string }> 
     }
 
     const url = `https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=${apiKey}&regions=us&markets=h2h,spreads,totals`;
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store" }); // Mantenha cache: "no-store" para suas páginas dinâmicas
 
     if (!res.ok) {
       const errorText = await res.text();
@@ -43,6 +43,56 @@ export async function fetchOddsData(): Promise<{ data: Odd[]; error?: string }> 
     return { data };
   } catch (error: unknown) {
     console.error("Erro inesperado em fetchOddsData:", error);
+    let errorMessage = "UNKNOWN_ERROR";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    }
+    return { data: [], error: errorMessage };
+  }
+}
+
+/**
+ * BUSCA DE DADOS ESPECÍFICA PARA O SITEMAP
+ * Busca dados de odds de eventos futuros/próximos com cache para permitir geração estática.
+ * @returns Um objeto contendo um array de Odd ou um código de erro.
+ */
+export async function fetchOddsForSitemap(): Promise<{ data: Odd[]; error?: string }> {
+  try {
+    const apiKey = process.env.ODDS_API_KEY;
+    if (!apiKey) {
+      console.error(
+        "[API_KEY_MISSING] API key não definida para fetchOddsForSitemap. Verifique suas variáveis de ambiente.",
+      );
+      return { data: [], error: "API_KEY_MISSING" };
+    }
+
+    const url = `https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=${apiKey}&regions=us&markets=h2h,spreads,totals`;
+    const res = await fetch(url, { next: { revalidate: 3600 } }); // Cache por 1 hora (3600 segundos) para o sitemap
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      try {
+        const errorData: OddsApiErrorResponse = JSON.parse(errorText);
+        if (errorData.error_code === "OUT_OF_USAGE_CREDITS") {
+          console.warn(`[QUOTA_EXCEEDED] Sua cota de uso da API The Odds API foi atingida.`, errorData);
+          return { data: [], error: "QUOTA_EXCEEDED" };
+        }
+        throw new Error(`Erro da API: ${res.status} - ${errorData.message || errorText}`);
+      } catch (_e: unknown) {
+        throw new Error(`Erro ao buscar odds para sitemap: ${res.status} - ${res.statusText} - ${errorText}`);
+      }
+    }
+
+    const data: Odd[] = await res.json();
+    if (!Array.isArray(data)) {
+      console.error("fetchOddsForSitemap: Resposta da API não é um array de Odd.", data);
+      return { data: [], error: "INVALID_DATA_FORMAT" };
+    }
+    return { data };
+  } catch (error: unknown) {
+    console.error("Erro inesperado em fetchOddsForSitemap:", error);
     let errorMessage = "UNKNOWN_ERROR";
     if (error instanceof Error) {
       errorMessage = error.message;
