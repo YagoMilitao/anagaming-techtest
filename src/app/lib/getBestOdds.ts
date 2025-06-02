@@ -13,27 +13,20 @@ export interface BestOutcomeDetail {
  * @returns Um array de objetos com o nome do outcome, o melhor preço e o nome do bookmaker.
  */
 export function getBestOdds(bookmakers: Bookmaker[]): BestOutcomeDetail[] {
-  const h2hMarkets = _.flatMap(bookmakers, (bookmaker) =>
-    _.filter(bookmaker.markets, { key: "h2h" })
-  );
+  const h2hMarkets = _.flatMap(bookmakers, (bookmaker) => _.filter(bookmaker.markets, { key: "h2h" }));
 
   if (_.isEmpty(h2hMarkets)) {
     return [];
   }
 
-  const allOutcomes: (Outcome & { bookmakerName: string })[] = _.flatMap(
-    h2hMarkets,
-    (market) => {
-      const parentBookmaker = _.find(bookmakers, (bm) =>
-        _.some(bm.markets, (m) => m === market)
-      );
-      return _.map(market.outcomes, (outcome) => ({
-        ...outcome,
-        bookmakerName: parentBookmaker ? parentBookmaker.title : "Unknown",
-      }));
-    }
-  );
-  
+  const allOutcomes: (Outcome & { bookmakerName: string })[] = _.flatMap(h2hMarkets, (market) => {
+    const parentBookmaker = _.find(bookmakers, (bm) => _.some(bm.markets, (m) => m === market));
+    return _.map(market.outcomes, (outcome) => ({
+      ...outcome,
+      bookmakerName: parentBookmaker ? parentBookmaker.title : "Unknown",
+    }));
+  });
+
   const groupedOutcomes = _.groupBy(allOutcomes, "name");
   const bestOutcomes: BestOutcomeDetail[] = [];
 

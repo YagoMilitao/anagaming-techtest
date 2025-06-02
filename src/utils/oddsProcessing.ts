@@ -27,7 +27,7 @@ export function sortOddsByCommenceTimeAsc(games: Odd[]): Odd[] {
     const timeB = new Date(b.commence_time).getTime();
 
     if (isNaN(timeA) && isNaN(timeB)) return 0;
-    if (isNaN(timeA)) return 1; 
+    if (isNaN(timeA)) return 1;
     if (isNaN(timeB)) return -1;
     if (timeA === timeB) {
       return a.id.localeCompare(b.id);
@@ -65,15 +65,11 @@ export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
  * @param gameDurationMs A duração estimada de um jogo em milissegundos (padrão: 3 horas).
  * @returns Um objeto contendo listas de odds para cada categoria.
  */
-export function categorizeOddsByTime(
-  odds: Odd[],
-  currentTime: number,
-  gameDurationMs: number = 3 * 60 * 60 * 1000
-) {
+export function categorizeOddsByTime(odds: Odd[], currentTime: number, gameDurationMs: number = 3 * 60 * 60 * 1000) {
   const groupedOdds = _.groupBy(odds, (odd) => {
     const commenceTime = new Date(odd.commence_time).getTime();
     if (isNaN(commenceTime)) {
-      return 'invalid';
+      return "invalid";
     }
 
     if (commenceTime <= currentTime && currentTime <= commenceTime + gameDurationMs) {
@@ -86,8 +82,8 @@ export function categorizeOddsByTime(
   });
 
   return {
-    liveGames: (groupedOdds.live || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
-    futureGames: (groupedOdds.future || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
-    finishedGames: (groupedOdds.finished || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
+    liveGames: (groupedOdds.live || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
+    futureGames: (groupedOdds.future || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
+    finishedGames: (groupedOdds.finished || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
   };
 }
