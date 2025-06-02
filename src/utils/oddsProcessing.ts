@@ -1,4 +1,5 @@
 import { Odd } from "@/data/Odd";
+import _ from "lodash";
 
 /**
  * Filtra uma lista de odds com base nas chaves de esporte selecionadas.
@@ -11,7 +12,7 @@ export function filterOddsBySportKeys(odds: Odd[], selectedSportKeys: string[]):
   if (!selectedSportKeys || selectedSportKeys.length === 0) {
     return odds;
   }
-  return odds.filter((odd) => selectedSportKeys.includes(odd.sport_key));
+  return _.filter(odds, (odd) => _.includes(selectedSportKeys, odd.sport_key));
 }
 
 /**
@@ -26,7 +27,7 @@ export function sortOddsByCommenceTimeAsc(games: Odd[]): Odd[] {
     const timeB = new Date(b.commence_time).getTime();
 
     if (isNaN(timeA) && isNaN(timeB)) return 0;
-    if (isNaN(timeA)) return 1;
+    if (isNaN(timeA)) return 1; 
     if (isNaN(timeB)) return -1;
     if (timeA === timeB) {
       return a.id.localeCompare(b.id);
@@ -64,26 +65,29 @@ export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
  * @param gameDurationMs A duração estimada de um jogo em milissegundos (padrão: 3 horas).
  * @returns Um objeto contendo listas de odds para cada categoria.
  */
-export function categorizeOddsByTime(odds: Odd[], currentTime: number, gameDurationMs: number = 3 * 60 * 60 * 1000) {
-  const liveGames: Odd[] = [];
-  const futureGames: Odd[] = [];
-  const finishedGames: Odd[] = [];
-
-  odds.forEach((odd) => {
+export function categorizeOddsByTime(
+  odds: Odd[],
+  currentTime: number,
+  gameDurationMs: number = 3 * 60 * 60 * 1000
+) {
+  const groupedOdds = _.groupBy(odds, (odd) => {
     const commenceTime = new Date(odd.commence_time).getTime();
-
     if (isNaN(commenceTime)) {
-      return;
+      return 'invalid';
     }
 
     if (commenceTime <= currentTime && currentTime <= commenceTime + gameDurationMs) {
-      liveGames.push(odd);
+      return "live";
     } else if (commenceTime > currentTime) {
-      futureGames.push(odd);
-    } else if (commenceTime + gameDurationMs < currentTime) {
-      finishedGames.push(odd);
+      return "future";
+    } else {
+      return "finished";
     }
   });
 
-  return { liveGames, futureGames, finishedGames };
+  return {
+    liveGames: (groupedOdds.live || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
+    futureGames: (groupedOdds.future || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
+    finishedGames: (groupedOdds.finished || []).filter(odd => !isNaN(new Date(odd.commence_time).getTime())),
+  };
 }
