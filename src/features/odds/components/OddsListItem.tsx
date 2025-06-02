@@ -29,7 +29,7 @@ const OddsListItem: React.FC<OddsListItemProps> = ({ odd, onSelectOdd }) => {
     onSelectOdd(odd.id, odd.sport_key);
   };
 
-  let homePriceClass = "text-green-600"; 
+  let homePriceClass = "text-green-600";
   let awayPriceClass = "text-green-600";
 
   if (bestPriceHome !== null && bestPriceAway !== null) {

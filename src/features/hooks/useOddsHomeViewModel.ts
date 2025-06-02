@@ -34,12 +34,11 @@ export function useOddsHomeViewModel({
   const [clientCurrentTime, setClientCurrentTime] = useState(serverRenderedTimestamp);
   const { selectedSport, favoriteSports, toggleFavoriteSport, allSports } = useOddsContext();
 
-  
   useEffect(() => {
     setOdds(initialOdds);
     const intervalId = setInterval(() => {
       setClientCurrentTime(Date.now());
-    }, 60 * 1000); 
+    }, 60 * 1000);
     return () => clearInterval(intervalId);
   }, [initialOdds, serverRenderedTimestamp]);
 

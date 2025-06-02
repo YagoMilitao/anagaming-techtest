@@ -20,7 +20,7 @@ interface BestTeamOddsResult {
  * @returns As melhores odds para cada time/empate, incluindo o nome do bookmaker.
  */
 export function getBestTeamOdds(bookmakers: Bookmaker[], odd: Odd): BestTeamOddsResult {
-  const bestOutcomes: BestOutcomeDetail[] = getBestOdds(bookmakers); 
+  const bestOutcomes: BestOutcomeDetail[] = getBestOdds(bookmakers);
 
   let bestPriceHome: number | null = null;
   let bestOutcomeHome: string | null = null;
@@ -31,19 +31,18 @@ export function getBestTeamOdds(bookmakers: Bookmaker[], odd: Odd): BestTeamOdds
   let bestPriceDraw: number | null = null;
   let bestBookmakerDraw: string | null = null;
 
-
   const homeOdd = bestOutcomes.find((o) => o.name === odd.home_team);
   if (homeOdd) {
     bestPriceHome = homeOdd.price;
     bestOutcomeHome = homeOdd.name;
-    bestBookmakerHome = homeOdd.bookmakerName; 
+    bestBookmakerHome = homeOdd.bookmakerName;
   }
 
   const awayOdd = bestOutcomes.find((o) => o.name === odd.away_team);
   if (awayOdd) {
     bestPriceAway = awayOdd.price;
     bestOutcomeAway = awayOdd.name;
-    bestBookmakerAway = awayOdd.bookmakerName; 
+    bestBookmakerAway = awayOdd.bookmakerName;
   }
 
   const drawOdd = bestOutcomes.find((o) => o.name === "Draw");

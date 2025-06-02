@@ -1,6 +1,5 @@
 import React from "react";
 
-
 import {
   FaFutbol,
   FaBasketballBall,
@@ -20,12 +19,7 @@ import {
   FaMedal,
 } from "react-icons/fa";
 
-import { MdSportsTennis,
-         MdSportsHandball, 
-         MdSportsCricket, 
-         MdSportsRugby, 
-         MdSportsMma 
-} from "react-icons/md";
+import { MdSportsTennis, MdSportsHandball, MdSportsCricket, MdSportsRugby, MdSportsMma } from "react-icons/md";
 
 import { BiSolidTennisBall } from "react-icons/bi";
 interface SportIconMap {
@@ -55,11 +49,11 @@ const sportIconMap: SportIconMap = {
   wrestling: FaDumbbell,
   futsal: FaFutbol,
   badminton: MdSportsTennis,
-  waterpolo: FaSwimmer, 
+  waterpolo: FaSwimmer,
   darts: FaBullseye,
   snooker: FaMedal,
-  formula1: FaCar, 
-  formulae: FaCar, 
+  formula1: FaCar,
+  formulae: FaCar,
   lacrosse: FaMedal,
 };
 

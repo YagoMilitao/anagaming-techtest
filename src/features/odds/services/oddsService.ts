@@ -1,6 +1,5 @@
 import { Odd, SportGroup, Sport } from "@/data/Odd";
 
-
 function getApiKey(): string {
   const apiKey = process.env.ODDS_API_KEY;
   if (!apiKey) {

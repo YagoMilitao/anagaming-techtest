@@ -42,14 +42,13 @@ export function useOddsHomeViewModel({
     return () => clearInterval(intervalId);
   }, [initialOdds, serverRenderedTimestamp]);
 
-  
   const filteredOdds = useMemo(() => {
     const selectedGroup = allSports.find((g) => g.group === selectedSport);
     const selectedKeys: string[] = selectedGroup ? selectedGroup.keys : [];
     return filterOddsBySportKeys(odds, selectedKeys);
   }, [odds, selectedSport, allSports]);
 
-    const { liveGames, futureGames, finishedGames } = useMemo(() => {
+  const { liveGames, futureGames, finishedGames } = useMemo(() => {
     return categorizeOddsByTime(filteredOdds, clientCurrentTime);
   }, [filteredOdds, clientCurrentTime]);
   const sortedLiveGames = useMemo(() => sortOddsByCommenceTimeAsc(liveGames), [liveGames]);

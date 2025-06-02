@@ -64,11 +64,7 @@ export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
  * @param gameDurationMs A duração estimada de um jogo em milissegundos (padrão: 3 horas).
  * @returns Um objeto contendo listas de odds para cada categoria.
  */
-export function categorizeOddsByTime(
-  odds: Odd[],
-  currentTime: number,
-  gameDurationMs: number = 3 * 60 * 60 * 1000,
-) {
+export function categorizeOddsByTime(odds: Odd[], currentTime: number, gameDurationMs: number = 3 * 60 * 60 * 1000) {
   const liveGames: Odd[] = [];
   const futureGames: Odd[] = [];
   const finishedGames: Odd[] = [];

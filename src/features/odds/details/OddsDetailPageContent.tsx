@@ -41,7 +41,7 @@ export default function OddsDetailPageContent({ odd, error }: OddsDetailPageCont
   }
 
   const commenceDate = new Date(odd.commence_time);
-  const formattedDate = isNaN(commenceDate.getTime()) ? "Data Inválida" : formatDate(odd.commence_time); 
+  const formattedDate = isNaN(commenceDate.getTime()) ? "Data Inválida" : formatDate(odd.commence_time);
   const formattedTime = isNaN(commenceDate.getTime()) ? "Hora Inválida" : formatDate(odd.commence_time);
 
   const SportIcon = getSportIcon(odd.sport_key);

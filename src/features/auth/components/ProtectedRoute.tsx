@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       signIn(undefined, { callbackUrl: pathname });
     }
   }, [status, pathname]);
-  
+
   if (status === "loading") {
     return <OddsSkeleton />;
   }

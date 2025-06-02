@@ -1,6 +1,6 @@
 export interface Outcome {
   name: string;
-  price: number; 
+  price: number;
   point?: number;
 }
 
@@ -22,8 +22,8 @@ export interface Odd {
   home_team: string;
   away_team: string;
   bookmakers: Bookmaker[];
-  eventId?: string; 
-  sport?: string; 
+  eventId?: string;
+  sport?: string;
   status?: "live" | "future" | "finished" | string;
   league_name?: string;
 }

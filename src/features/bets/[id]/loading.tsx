@@ -16,31 +16,26 @@ export default function OddsSkeleton() {
   return (
     <ul className="space-y-4 mt-3 p-6 max-w-5xl mx-auto">
       {" "}
-      {Array.from({ length: 5 }).map(
-        (
-          _,
-          index,
-        ) => (
-          <motion.li
-            key={index}
-            variants={skeletonItem}
-            animate="pulse"
-            className="bg-white rounded-xl shadow-md p-5 border border-gray-200"
-          >
-            <div className="flex justify-between items-center mb-3">
-              <div className="h-4 w-24 bg-gray-300 rounded animate-pulse" />
-              <div className="h-4 w-32 bg-gray-300 rounded animate-pulse" />
-              <div className="h-4 w-20 bg-gray-300 rounded animate-pulse" />
-            </div>
-            <div className="h-5 w-3/4 bg-gray-300 rounded mb-4" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-              <div className="h-4 w-full bg-gray-300 rounded" />
-              <div className="h-4 w-full bg-gray-300 rounded" />
-            </div>
-            <div className="h-4 w-32 bg-gray-300 rounded" />
-          </motion.li>
-        ),
-      )}
+      {Array.from({ length: 5 }).map((_, index) => (
+        <motion.li
+          key={index}
+          variants={skeletonItem}
+          animate="pulse"
+          className="bg-white rounded-xl shadow-md p-5 border border-gray-200"
+        >
+          <div className="flex justify-between items-center mb-3">
+            <div className="h-4 w-24 bg-gray-300 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-gray-300 rounded animate-pulse" />
+            <div className="h-4 w-20 bg-gray-300 rounded animate-pulse" />
+          </div>
+          <div className="h-5 w-3/4 bg-gray-300 rounded mb-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+            <div className="h-4 w-full bg-gray-300 rounded" />
+            <div className="h-4 w-full bg-gray-300 rounded" />
+          </div>
+          <div className="h-4 w-32 bg-gray-300 rounded" />
+        </motion.li>
+      ))}
     </ul>
   );
 }
