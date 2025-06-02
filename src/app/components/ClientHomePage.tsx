@@ -39,9 +39,7 @@ function ClientHomePage({ initialOdds, session, serverRenderedTimestamp, errorMe
   }
 
   return (
-    // Container principal da página com max-width e centralização
     <main className="container mx-auto p-4 md:p-6 lg:p-8 max-w-screen-xl">
-      {/* Mensagem de erro */}
       {errorMessage && (
         <div
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 shadow-md"
@@ -51,8 +49,6 @@ function ClientHomePage({ initialOdds, session, serverRenderedTimestamp, errorMe
           <span className="block sm:inline ml-2">{errorMessage}</span>
         </div>
       )}
-
-      {/* Painel do Usuário (UserPanel) - já está bem encapsulado */}
       <UserPanel session={session}>
         {session ? (
           <div className="text-center mb-8">
@@ -68,8 +64,6 @@ function ClientHomePage({ initialOdds, session, serverRenderedTimestamp, errorMe
           </div>
         )}
       </UserPanel>
-
-      {/* Seção de Título e Botão de Limpar Favoritos */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 mt-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Apostas ao Vivo</h2>
         {session && favoriteSports.length > 0 && (
@@ -82,16 +76,11 @@ function ClientHomePage({ initialOdds, session, serverRenderedTimestamp, errorMe
           </button>
         )}
       </div>
-
-      {/* Filtros */}
       <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
-        <SportsFilter /> {/* Presumindo que SportsFilter lida com seu próprio estilo interno */}
+        <SportsFilter />
       </div>
-
-      {/* DropdownAccordions para categorias de jogos */}
       <section className="space-y-4">
         {" "}
-        {/* Adiciona espaçamento entre os acordeões */}
         <DropdownAccordion
           title={<span className="text-xl font-semibold">Jogos Ao Vivo</span>}
           defaultOpen

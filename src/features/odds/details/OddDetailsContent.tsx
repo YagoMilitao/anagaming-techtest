@@ -1,9 +1,4 @@
-// src/features/odds/details/OddDetailsContent.tsx
-// Este é o componente que exibe os detalhes de uma odd.
-// Ele é um componente de UI, não uma rota.
-"use client"; // Marque como Client Component se você planeja adicionar interatividade (ex: botões de apostas, estados),
-// caso contrário, pode ser um Server Component sem esta diretiva.
-// Manteremos 'use client' por enquanto, pois você usa ícones e formatação de data que podem se beneficiar.
+"use client";
 
 import { FaCalendarAlt, FaClock } from "react-icons/fa";
 import { Odd } from "@/data/Odd";
@@ -13,11 +8,10 @@ import { getSportName } from "@/utils/sportNameDictionary";
 
 interface OddDetailsContentProps {
   odd: Odd | null;
-  error?: string | null; // Erro já tratado e traduzido do fetchOdds.ts
+  error?: string | null;
 }
 
 export default function OddDetailsContent({ odd, error }: OddDetailsContentProps) {
-  // Trata erros de busca (Quota, API Key, etc.)
   if (error) {
     let errorMessage: string;
     switch (error) {
@@ -31,14 +25,14 @@ export default function OddDetailsContent({ odd, error }: OddDetailsContentProps
       case "INVALID_DATA_FORMAT":
         errorMessage = "Erro ao processar os dados dos detalhes da partida.";
         break;
-      case "EVENT_NOT_FOUND": // NOVO CASO DE ERRO
+      case "EVENT_NOT_FOUND":
         errorMessage =
           "A partida que você tentou acessar não foi encontrada ou já expirou. Por favor, volte para a lista de jogos.";
         break;
-      case "API_ERROR": // Erros genéricos da API
+      case "API_ERROR":
         errorMessage = "Erro da API ao carregar detalhes da partida. Tente novamente.";
         break;
-      case "NETWORK_ERROR": // Erros de rede ou JSON inválido
+      case "NETWORK_ERROR":
         errorMessage = "Erro de rede ao buscar detalhes da partida. Verifique sua conexão.";
         break;
       case "UNKNOWN_ERROR":
@@ -49,12 +43,10 @@ export default function OddDetailsContent({ odd, error }: OddDetailsContentProps
     return <div className="p-6 text-center text-gray-700 text-xl">{errorMessage}</div>;
   }
 
-  // Trata o caso de odd não encontrada (mas sem erro explícito da API, como um ID inválido)
   if (!odd) {
     return <div className="p-6 text-center text-gray-700 text-xl">Odd não encontrada.</div>;
   }
 
-  // Validação mais rigorosa dos dados antes de usar
   if (
     typeof odd.home_team !== "string" ||
     typeof odd.away_team !== "string" ||

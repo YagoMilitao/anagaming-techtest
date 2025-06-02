@@ -13,15 +13,13 @@ const skeletonItem = {
 };
 
 export default function OddsSkeleton() {
-  // Removido 'count' prop para simplicidade no loading.tsx
   return (
     <ul className="space-y-4 mt-3 p-6 max-w-5xl mx-auto">
       {" "}
-      {/* Adicionei p-6 e max-w-5xl mx-auto para consistência */}
       {Array.from({ length: 5 }).map(
         (
           _,
-          index, // Renderiza 5 itens de esqueleto
+          index,
         ) => (
           <motion.li
             key={index}

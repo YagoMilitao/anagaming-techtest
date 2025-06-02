@@ -9,13 +9,10 @@ export default async function HomePage() {
   const session: Session | null = await getServerSession(authOptions);
 
   let initialOdds: Odd[] = [];
-  let displayErrorMessage: string | null = null; // Mensagem para o usuário na tela
-
-  // Chama a função de busca de dados que já trata a quota
+  let displayErrorMessage: string | null = null;
   const fetchResult = await fetchOddsData();
 
   if (fetchResult.error) {
-    // Atribui a mensagem de erro específica para exibição na UI
     switch (fetchResult.error) {
       case "QUOTA_EXCEEDED":
         displayErrorMessage =
@@ -34,12 +31,11 @@ export default async function HomePage() {
           "Não foi possível carregar os dados das apostas. Verifique sua conexão com a internet ou tente novamente mais tarde.";
         break;
     }
-    initialOdds = []; // Garante que não passamos dados incompletos ou errados
+    initialOdds = [];
   } else {
     initialOdds = fetchResult.data;
   }
 
-  // Caso não haja erro, mas a lista de odds esteja vazia (API não retornou jogos)
   if (initialOdds.length === 0 && !displayErrorMessage) {
     displayErrorMessage = "Nenhum evento de aposta disponível no momento. Volte mais tarde!";
   }
@@ -49,7 +45,7 @@ export default async function HomePage() {
       initialOdds={initialOdds}
       session={session}
       serverRenderedTimestamp={Date.now()}
-      errorMessage={displayErrorMessage} // Passa a mensagem de erro para o Client Component
+      errorMessage={displayErrorMessage}
     />
   );
 }

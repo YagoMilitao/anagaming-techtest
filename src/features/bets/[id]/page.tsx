@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { getOddDetails } from "@/features/odds/services/oddsService"; // Importe o serviço de busca de dados
-import { OddDetailsDisplay } from "@/features/odds/components/OddDetailsDisplay"; // Importe o componente de UI
+import { getOddDetails } from "@/features/odds/services/oddsService";
+import { OddDetailsDisplay } from "@/features/odds/components/OddDetailsDisplay";
 
 interface OddDetailPageProps {
   params: {
-    id: string; // O ID da odd será passado via props
+    id: string;
   };
 }
 
@@ -13,18 +13,15 @@ export default async function OddDetailPage({ params }: OddDetailPageProps) {
 
   let oddData;
   try {
-    oddData = await getOddDetails(id); // Chamada direta ao serviço do servidor
+    oddData = await getOddDetails(id);
   } catch (error) {
-    // Erros de busca de dados serão capturados pelo error.tsx
     console.error("Erro ao buscar dados da odd no Server Component:", error);
-    throw error; // Propagar o erro para o error.tsx
+    throw error;
   }
 
   if (!oddData) {
-    // Se a odd não for encontrada (ex: API retornou null ou 404), use notFound() do Next.js
     notFound();
   }
 
-  // Passa os dados para o Client Component de exibição
   return <OddDetailsDisplay odd={oddData} />;
 }

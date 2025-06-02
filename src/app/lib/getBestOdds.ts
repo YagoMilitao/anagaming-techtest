@@ -3,7 +3,7 @@ import { Bookmaker, Market, Outcome } from "@/data/Odd";
 export interface BestOutcomeDetail {
   name: string;
   price: number;
-  bookmakerName: string; // Adicionado: Nome da casa de apostas
+  bookmakerName: string;
 }
 
 /**
@@ -27,19 +27,15 @@ export function getBestOdds(bookmakers: Bookmaker[]): BestOutcomeDetail[] {
   const bestOutcomesMap = new Map<string, BestOutcomeDetail>();
 
   bookmakers.forEach((bookmaker) => {
-    // Encontra o mercado 'h2h' (Head-to-Head)
     const h2hMarket = bookmaker.markets.find((market: Market) => market.key === "h2h");
 
     if (h2hMarket) {
       h2hMarket.outcomes.forEach((outcome: Outcome) => {
-        // Se este outcome já existe no mapa e o preço atual é menor ou igual,
-        // ou se o outcome não existe no mapa, atualiza.
-        // Queremos o preço MAIS ALTO.
         if (!bestOutcomesMap.has(outcome.name) || outcome.price > bestOutcomesMap.get(outcome.name)!.price) {
           bestOutcomesMap.set(outcome.name, {
             name: outcome.name,
             price: outcome.price,
-            bookmakerName: bookmaker.title, // !!! Agora inclui o nome do bookmaker
+            bookmakerName: bookmaker.title,
           });
         }
       });

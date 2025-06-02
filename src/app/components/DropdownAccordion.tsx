@@ -1,5 +1,4 @@
-// src/app/components/DropdownAccordion.tsx
-"use client"; // Provavelmente precisa desta diretiva
+"use client";
 
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Para ícones de acordeão
@@ -9,8 +8,8 @@ interface DropdownAccordionProps {
   title: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
-  count?: number; // Para mostrar quantos itens estão na seção
-  status?: "live" | "future" | "finished"; // Para talvez mudar cores/ícones
+  count?: number;
+  status?: "live" | "future" | "finished";
 }
 
 const DropdownAccordion: React.FC<DropdownAccordionProps> = ({
@@ -26,7 +25,6 @@ const DropdownAccordion: React.FC<DropdownAccordionProps> = ({
     setIsOpen(!isOpen);
   };
 
-  // Cores baseadas no status
   const headerBgClass =
     status === "live"
       ? "bg-gradient-to-r from-blue-600 to-blue-800"

@@ -1,10 +1,4 @@
-// src/features/odds/details/OddsDetailPageContent.tsx
-// Este é um componente reutilizável que exibe os detalhes de uma odd.
-// Ele não é um Server Component de rota diretamente.
-
-"use client"; // Pode ser um Client Component se precisar de interatividade, ou um Server Component "puro" se não tiver estados/efeitos.
-// Neste caso, se for só display, pode ser um Server Component sem 'use client'.
-// Vamos deixá-lo sem 'use client' por enquanto para ser renderizado no servidor se possível.
+"use client";
 
 import { FaCalendarAlt, FaClock } from "react-icons/fa";
 import { Odd } from "@/data/Odd";
@@ -32,7 +26,6 @@ export default function OddsDetailPageContent({ odd, error }: OddsDetailPageCont
     return <div className="p-6 text-center text-gray-700 text-xl">{displayMessage}</div>;
   }
 
-  // Validação mais rigorosa dos dados antes de usar
   if (
     typeof odd.home_team !== "string" ||
     typeof odd.away_team !== "string" ||
@@ -48,8 +41,8 @@ export default function OddsDetailPageContent({ odd, error }: OddsDetailPageCont
   }
 
   const commenceDate = new Date(odd.commence_time);
-  const formattedDate = isNaN(commenceDate.getTime()) ? "Data Inválida" : formatDate(odd.commence_time); // Usando date-fns
-  const formattedTime = isNaN(commenceDate.getTime()) ? "Hora Inválida" : formatDate(odd.commence_time); // Usando date-fns
+  const formattedDate = isNaN(commenceDate.getTime()) ? "Data Inválida" : formatDate(odd.commence_time); 
+  const formattedTime = isNaN(commenceDate.getTime()) ? "Hora Inválida" : formatDate(odd.commence_time);
 
   const SportIcon = getSportIcon(odd.sport_key);
   return (

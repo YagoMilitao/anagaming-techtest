@@ -1,15 +1,14 @@
-"use client"; // Error Boundaries devem ser Client Components
+"use client";
 
 import { useEffect } from "react";
 
 interface ErrorPageProps {
-  error: Error; // O erro que ocorreu
-  reset: () => void; // Função para tentar renderizar a rota novamente
+  error: Error;
+  reset: () => void;
 }
 
 export default function OddDetailsError({ error, reset }: ErrorPageProps) {
   useEffect(() => {
-    // Você pode logar o erro para um serviço de monitoramento de erros (ex: Sentry, LogRocket)
     console.error("Error in Odd Details Page:", error);
   }, [error]);
 
@@ -22,7 +21,6 @@ export default function OddDetailsError({ error, reset }: ErrorPageProps) {
       <button
         className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={
-          // Tenta re-renderizar o segmento da rota
           () => reset()
         }
       >

@@ -1,7 +1,6 @@
 "use client";
 
 import { SportGroup } from "@/data/Odd";
-// Use suas tipagens unificadas
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 
 type OddsContextType = {
@@ -15,32 +14,27 @@ type OddsContextType = {
   setSortBy: (value: string) => void;
   favoriteSports: string[];
   toggleFavoriteSport: (sport: string) => void;
-  allSports: SportGroup[]; // Agora os esportes são recebidos via prop
-  // setAllSports: (sports: SportGroup[]) => void // Não precisamos de setAllSports aqui
+  allSports: SportGroup[];
 };
 
 const OddsContext = createContext<OddsContextType | undefined>(undefined);
 
 interface OddsProviderProps {
   children: ReactNode;
-  initialSports: SportGroup[]; // Dados de esportes vindos do servidor
+  initialSports: SportGroup[];
 }
 
 export const OddsProvider = ({ children, initialSports }: OddsProviderProps) => {
   const [sortBy, setSortBy] = useState("");
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedChampionship, setSelectedChampionship] = useState("");
-  // allSports agora é inicializado com a prop
   const [allSports] = useState<SportGroup[]>(initialSports);
-
   const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
-    // Isso é um pattern excelente para localStorage no estado inicial
     if (typeof window !== "undefined") {
       try {
         const stored = localStorage.getItem("favoriteSports");
         return stored ? JSON.parse(stored) : [];
       } catch {
-        // Em caso de erro na leitura do localStorage
         console.error("Failed to parse favoriteSports from localStorage.");
         return [];
       }
@@ -56,20 +50,17 @@ export const OddsProvider = ({ children, initialSports }: OddsProviderProps) => 
 
   const toggleFavoriteSport = useCallback((sport: string) => {
     setFavoriteSports((prev) => (prev.includes(sport) ? prev.filter((s) => s !== sport) : [...prev, sport]));
-  }, []); // Adicionado useCallback para otimização
+  }, []);
 
   const applySportFilter = useCallback((sport: string) => {
     setSelectedSport(sport);
     setSelectedChampionship("");
-  }, []); // Adicionado useCallback para otimização
+  }, []);
 
   const applyChampionshipFilter = useCallback((championship: string) => {
     setSelectedChampionship(championship);
     setSelectedSport("");
-  }, []); // Adicionado useCallback para otimização
-
-  // A função loadSports e o useEffect relacionado foram REMOVIDOS daqui
-  // A busca de esportes agora é feita no Server Component e passada via prop
+  }, []);
 
   return (
     <OddsContext.Provider
@@ -85,7 +76,6 @@ export const OddsProvider = ({ children, initialSports }: OddsProviderProps) => 
         favoriteSports,
         toggleFavoriteSport,
         allSports,
-        // setAllSports não é mais necessário, pois allSports é gerenciado internamente ou via prop
       }}
     >
       {children}

@@ -1,6 +1,5 @@
 import { Odd, SportGroup } from "@/data/Odd";
 
-// Interface para a estrutura de erro que a The Odds API pode retornar
 interface OddsApiErrorResponse {
   message: string;
   error_code?: string;
@@ -30,10 +29,8 @@ export async function fetchOddsData(): Promise<{ data: Odd[]; error?: string }> 
           console.warn(`[QUOTA_EXCEEDED] Sua cota de uso da API The Odds API foi atingida.`, errorData);
           return { data: [], error: "QUOTA_EXCEEDED" }; // Sinaliza erro de quota
         }
-        // Para outros erros da API que não são de quota, ainda lançamos um erro
         throw new Error(`Erro da API: ${res.status} - ${errorData.message || errorText}`);
       } catch (_e: unknown) {
-        // Se a resposta de erro não for JSON ou o parse falhar, lança um erro geral
         throw new Error(`Erro ao buscar odds: ${res.status} - ${res.statusText} - ${errorText}`);
       }
     }
@@ -45,16 +42,14 @@ export async function fetchOddsData(): Promise<{ data: Odd[]; error?: string }> 
     }
     return { data };
   } catch (error: unknown) {
-    // ALTERADO: catch (error: unknown)
     console.error("Erro inesperado em fetchOddsData:", error);
-    // Para usar 'error.message', faça uma verificação de tipo
     let errorMessage = "UNKNOWN_ERROR";
     if (error instanceof Error) {
       errorMessage = error.message;
     } else if (typeof error === "string") {
       errorMessage = error;
     }
-    return { data: [], error: errorMessage }; // Retorna a mensagem de erro
+    return { data: [], error: errorMessage };
   }
 }
 
@@ -80,7 +75,6 @@ export async function fetchOddById(sport: string, eventId: string): Promise<{ da
       try {
         const errorData: OddsApiErrorResponse = JSON.parse(errorText);
 
-        // MUDANÇAS AQUI: Trata EVENT_NOT_FOUND e outros erros da API retornando um erro string
         if (errorData.error_code === "OUT_OF_USAGE_CREDITS") {
           console.warn(`[QUOTA_EXCEEDED] Sua cota de uso da API The Odds API foi atingida.`, errorData);
           return { data: null, error: "QUOTA_EXCEEDED" };
@@ -89,12 +83,10 @@ export async function fetchOddById(sport: string, eventId: string): Promise<{ da
             `[EVENT_NOT_FOUND] Evento ${eventId} para o esporte ${sport} não encontrado ou expirou.`,
             errorData,
           );
-          return { data: null, error: "EVENT_NOT_FOUND" }; // Retorna erro específico
+          return { data: null, error: "EVENT_NOT_FOUND" };
         }
-        // Para outros erros da API, retorna um erro genérico
         return { data: null, error: `API_ERROR: ${errorData.message || errorText}` };
       } catch (_e) {
-        // Se a resposta de erro não for JSON ou o parse falhar, retorna um erro geral
         return { data: null, error: `NETWORK_ERROR: ${response.status} - ${response.statusText}` };
       }
     }
@@ -135,7 +127,6 @@ export async function fetchSports(): Promise<{ data: SportGroup[]; error?: strin
         }
         throw new Error(`Erro da API: ${res.status} - ${errorData.message || errorText}`);
       } catch (_e: unknown) {
-        // Se a resposta de erro não for JSON ou o parse falhar, lança um erro geral
         throw new Error(`Erro ao buscar esportes: ${res.status} - ${res.statusText} - ${errorText}`);
       }
     }

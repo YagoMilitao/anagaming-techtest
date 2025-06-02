@@ -28,12 +28,10 @@ export function sortOddsByCommenceTimeAsc(games: Odd[]): Odd[] {
     if (isNaN(timeA) && isNaN(timeB)) return 0;
     if (isNaN(timeA)) return 1;
     if (isNaN(timeB)) return -1;
-
-    // Se os tempos de início são idênticos, usa o ID como critério de desempate
     if (timeA === timeB) {
       return a.id.localeCompare(b.id);
     }
-    return timeA - timeB; // Ordem crescente
+    return timeA - timeB;
   });
 }
 
@@ -51,12 +49,10 @@ export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
     if (isNaN(timeA) && isNaN(timeB)) return 0;
     if (isNaN(timeA)) return 1;
     if (isNaN(timeB)) return -1;
-
-    // Se os tempos de início são idênticos, usa o ID como critério de desempate
     if (timeA === timeB) {
       return a.id.localeCompare(b.id);
     }
-    return timeB - timeA; // Ordem decrescente
+    return timeB - timeA;
   });
 }
 
@@ -71,7 +67,7 @@ export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
 export function categorizeOddsByTime(
   odds: Odd[],
   currentTime: number,
-  gameDurationMs: number = 3 * 60 * 60 * 1000, // 3 horas em milissegundos
+  gameDurationMs: number = 3 * 60 * 60 * 1000,
 ) {
   const liveGames: Odd[] = [];
   const futureGames: Odd[] = [];
@@ -81,7 +77,6 @@ export function categorizeOddsByTime(
     const commenceTime = new Date(odd.commence_time).getTime();
 
     if (isNaN(commenceTime)) {
-      // console.warn(`Odd com data de início inválida ignorada: ${odd.id}`) // Pode remover em produção
       return;
     }
 

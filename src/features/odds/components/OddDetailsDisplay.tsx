@@ -1,5 +1,4 @@
-// src/features/odds/components/OddDetailsDisplay.tsx
-"use client"; // Marque este componente como Client Component
+"use client";
 
 import { Odd, Bookmaker, Market, Outcome } from "@/data/Odd";
 import { FaCalendarAlt, FaClock, FaTrophy } from "react-icons/fa";
@@ -18,9 +17,8 @@ export function OddDetailsDisplay({ odd }: OddDetailsDisplayProps) {
         <div className="flex items-center text-gray-600 mb-2">
           <FaTrophy className="mr-2" />
           <span>
-            {odd.sport_title} - {odd.league_name || "N/A"}
+            {odd.sport_title} - {odd.league_name || "Nome Indisponivel"}
           </span>{" "}
-          {/* Use league_name se disponível */}
         </div>
         <div className="flex items-center text-gray-600 mb-2">
           <FaCalendarAlt className="mr-2" />

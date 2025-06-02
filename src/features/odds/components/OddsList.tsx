@@ -1,5 +1,4 @@
-// src/features/odds/components/OddsList.tsx
-"use client"; // Mantenha esta diretiva!
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -65,10 +64,8 @@ const OddsList: React.FC<OddsListProps> = ({ odds }) => {
     );
   }
 
-  // >>> ÚNICA MUDANÇA AQUI: NOVO UL SEM RESPONSIVIDADE DE COLUNAS MULTIPLAS E COM w-full <<<
   if (!hasMounted) {
     return (
-      // Agora o ul ocupa 100% da largura e sempre tem 1 coluna
       <ul className="grid grid-cols-1 gap-4 mt-3 w-full">
         {itemIds.map((id) => {
           const odd = oddsMap.get(id);

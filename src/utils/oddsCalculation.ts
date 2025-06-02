@@ -1,7 +1,4 @@
-// src/utils/oddsCalculation.ts
-
 import { Bookmaker, Odd } from "@/data/Odd";
-// Importa a nova interface e a função ajustada
 import { getBestOdds, BestOutcomeDetail } from "@/app/lib/getBestOdds";
 
 interface BestTeamOddsResult {
@@ -23,40 +20,36 @@ interface BestTeamOddsResult {
  * @returns As melhores odds para cada time/empate, incluindo o nome do bookmaker.
  */
 export function getBestTeamOdds(bookmakers: Bookmaker[], odd: Odd): BestTeamOddsResult {
-  const bestOutcomes: BestOutcomeDetail[] = getBestOdds(bookmakers); // Agora, retorna BestOutcomeDetail[]
+  const bestOutcomes: BestOutcomeDetail[] = getBestOdds(bookmakers); 
 
   let bestPriceHome: number | null = null;
   let bestOutcomeHome: string | null = null;
   let bestBookmakerHome: string | null = null;
-
   let bestPriceAway: number | null = null;
   let bestOutcomeAway: string | null = null;
   let bestBookmakerAway: string | null = null;
-
   let bestPriceDraw: number | null = null;
   let bestBookmakerDraw: string | null = null;
 
-  // Encontra as odds para o time da casa
+
   const homeOdd = bestOutcomes.find((o) => o.name === odd.home_team);
   if (homeOdd) {
     bestPriceHome = homeOdd.price;
     bestOutcomeHome = homeOdd.name;
-    bestBookmakerHome = homeOdd.bookmakerName; // !!! Pegando o nome do bookmaker
+    bestBookmakerHome = homeOdd.bookmakerName; 
   }
 
-  // Encontra as odds para o time visitante
   const awayOdd = bestOutcomes.find((o) => o.name === odd.away_team);
   if (awayOdd) {
     bestPriceAway = awayOdd.price;
     bestOutcomeAway = awayOdd.name;
-    bestBookmakerAway = awayOdd.bookmakerName; // !!! Pegando o nome do bookmaker
+    bestBookmakerAway = awayOdd.bookmakerName; 
   }
 
-  // Encontra as odds para "Draw" (Empate), se existir
   const drawOdd = bestOutcomes.find((o) => o.name === "Draw");
   if (drawOdd) {
     bestPriceDraw = drawOdd.price;
-    bestBookmakerDraw = drawOdd.bookmakerName; // !!! Pegando o nome do bookmaker
+    bestBookmakerDraw = drawOdd.bookmakerName;
   }
 
   return {
