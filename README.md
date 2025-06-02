@@ -53,6 +53,7 @@ Após o login, você será redirecionado à **home**, que exibe:
 #### 📈 Visualização de Odds
 - Cada evento exibe as **melhores odds para os times em disputa**.
 - As **odds mais altas** são destacadas em **verde**, para facilitar a comparação.
+- As casas são indicadas abaixo das odds para melhor visualização
 
 #### 🔍 Filtros Personalizados
 - Utilize os **filtros na parte superior da página** para personalizar sua experiência:
