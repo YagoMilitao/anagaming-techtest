@@ -4,6 +4,24 @@ import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import { Odd } from "@/data/Odd";
 import { authOptions } from "@/app/lib/authOptions";
+import type { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: "Odds Ao Vivo - esportes em Tempo Real",
+  description: "Acompanhe as últimas odds ao vivo para os principais esportes. Veja os próximos jogos, resultados e tendências para suas apostas. Sua fonte para odds atualizadas de futebol, basquete, e-Sports e mais.",
+  keywords: ["odds futebol", "odds basquete", "odds e-sports", "apostas ao vivo", "jogos de hoje", "próximos jogos", "odds em tempo real"],
+  openGraph: {
+    images: [
+      {
+        url: "https://anagaming-techtest.vercel.app/images/logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Anagaming - Odds Ao Vivo",
+      },
+    ],
+  },
+};
 
 export default async function HomePage() {
   const session: Session | null = await getServerSession(authOptions);
