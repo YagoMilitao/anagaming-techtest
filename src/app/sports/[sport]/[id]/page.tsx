@@ -1,14 +1,18 @@
+// src/app/sports/[sport]/[id]/page.tsx
 import { fetchOddById } from "@/app/lib/fetchOdds";
 import OddsDetailPageContent from "@/features/odds/details/OddsDetailPageContent";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-interface Props {
-  params: { sport: string; id: string };
+// Interface para os parâmetros da URL
+interface PageParams {
+  sport: string;
+  id: string;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id, sport } = params;
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const { id, sport } = params as PageParams;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: odd, error } = await fetchOddById(sport, id);
 
   if (!odd || error) {
@@ -20,13 +24,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const eventTitle = `${odd.home_team} vs ${odd.away_team}`;
-  const formattedSportName = sport.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() 
-                              + word.slice(1)).join(' ');
+  const formattedSportName = sport
+    .replace(/-/g, " ")
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  const baseUrl = "https://anagaming-techtest.vercel.app";
 
   return {
     title: `${eventTitle} - Odds de ${formattedSportName} | Anagaming`,
-    description: `Acompanhe as odds ao vivo e informações detalhadas para o jogo de ${formattedSportName}: 
-                    ${eventTitle}. Veja as melhores cotações e prepare suas apostas.`,
+    description: `Acompanhe as odds ao vivo e informações detalhadas para o jogo de ${formattedSportName}: ${eventTitle}. Veja as melhores cotações e prepare suas apostas.`,
     keywords: [
       `${odd.home_team} odds`,
       `${odd.away_team} odds`,
@@ -38,14 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       odd.away_team,
       formattedSportName,
     ],
-    
     openGraph: {
       title: `${eventTitle} - Odds de ${formattedSportName} | Anagaming`,
       description: `Odds e informações para o jogo ${eventTitle} de ${formattedSportName}.`,
-      url: `https://anagaming-techtest.vercel.app/sports/${sport}/${id}`,
+      url: `${baseUrl}/sports/${sport}/${id}`,
       images: [
         {
-          url: "https://anagaming-techtest.vercel.app/images/logo.jpg",
+          url: `${baseUrl}/images/logo.jpg`,
           width: 1200,
           height: 630,
           alt: `${eventTitle} Odds`,
@@ -53,12 +60,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
       type: "website",
     },
-   
   };
 }
 
-export default async function OddDetailsPage({ params }: Props) {
-  const { sport, id } = params;
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function OddDetailsPage({ params }: { params: any }) {
+  const { sport, id } = params as PageParams;
   const { data: odd, error } = await fetchOddById(sport, id);
 
   if (!odd || error) {

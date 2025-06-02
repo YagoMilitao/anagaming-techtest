@@ -6,11 +6,19 @@ import { Odd } from "@/data/Odd";
 import { authOptions } from "@/app/lib/authOptions";
 import type { Metadata } from "next";
 
-
 export const metadata: Metadata = {
   title: "Odds Ao Vivo - esportes em Tempo Real",
-  description: "Acompanhe as últimas odds ao vivo para os principais esportes. Veja os próximos jogos, resultados e tendências para suas apostas. Sua fonte para odds atualizadas de futebol, basquete, e-Sports e mais.",
-  keywords: ["odds futebol", "odds basquete", "odds e-sports", "apostas ao vivo", "jogos de hoje", "próximos jogos", "odds em tempo real"],
+  description:
+    "Acompanhe as últimas odds ao vivo para os principais esportes. Veja os próximos jogos, resultados e tendências para suas apostas. Sua fonte para odds atualizadas de futebol, basquete, e-Sports e mais.",
+  keywords: [
+    "odds futebol",
+    "odds basquete",
+    "odds e-sports",
+    "apostas ao vivo",
+    "jogos de hoje",
+    "próximos jogos",
+    "odds em tempo real",
+  ],
   openGraph: {
     images: [
       {

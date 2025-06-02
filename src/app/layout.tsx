@@ -11,15 +11,27 @@ export const metadata: Metadata = {
     default: "Anagaming - Acompanhe as Melhores Odds em Tempo Real",
     template: "%s | Anagaming",
   },
-  description: "Acompanhe as melhores odds e resultados de apostas esportivas em tempo real. Futebol, Basquete, e-Sports e mais. Sua plataforma para apostas inteligentes.",
-  keywords: ["odds ao vivo", "apostas esportivas", "prognósticos", "resultados esportivos", "futebol", "basquete", "e-sports", "apostas online", "anagaming"],
+  description:
+    "Acompanhe as melhores odds e resultados de apostas esportivas em tempo real. Futebol, Basquete, e-Sports e mais. Sua plataforma para apostas inteligentes.",
+  keywords: [
+    "odds ao vivo",
+    "apostas esportivas",
+    "prognósticos",
+    "resultados esportivos",
+    "futebol",
+    "basquete",
+    "e-sports",
+    "apostas online",
+    "anagaming",
+  ],
   authors: [{ name: "Yago Militão" }],
   creator: "Yago Militão",
   publisher: "Anagaming",
   applicationName: "AnagamingBets",
   openGraph: {
     title: "Anagaming - Acompanhe as Melhores Odds em Tempo Real",
-    description: "Sua plataforma para apostas inteligentes. Odds de futebol, basquete, e-Sports e muito mais, tudo em tempo real.",
+    description:
+      "Sua plataforma para apostas inteligentes. Odds de futebol, basquete, e-Sports e muito mais, tudo em tempo real.",
     url: "https://anagaming-techtest.vercel.app/",
     siteName: "Anagaming",
     images: [
@@ -37,8 +49,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Anagaming - Acompanhe as Melhores Odds em Tempo Real",
-    description: "Odds ao vivo para futebol, basquete, e-Sports. Análise de apostas e resultados em tempo real. #ApostasEsportivas #OddsAoVivo",
-    site: "@yagolis", 
+    description:
+      "Odds ao vivo para futebol, basquete, e-Sports. Análise de apostas e resultados em tempo real. #ApostasEsportivas #OddsAoVivo",
+    site: "@yagolis",
     creator: "@yagolis",
     images: "https://anagaming-techtest.vercel.app/images/logo-black.png",
   },
