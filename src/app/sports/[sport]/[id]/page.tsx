@@ -1,10 +1,8 @@
-// src/app/sports/[sport]/[id]/page.tsx
 import { fetchOddById } from "@/app/lib/fetchOdds";
 import OddsDetailPageContent from "@/features/odds/details/OddsDetailPageContent";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-// Interface para os parâmetros da URL
 interface PageParams {
   sport: string;
   id: string;
