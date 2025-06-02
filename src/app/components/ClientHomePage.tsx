@@ -1,116 +1,81 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from "react";
-import { fetchOddsData } from "../lib/fetchOdds";
-import { useOddsContext } from "../context/OddsContext";
-import UserPanel from "./User/UserPanel";
-import DropdownAccordion from "./DropdownAccordion";
-import SportsFilter from "./Filters/SportsFilter";
+import React from "react";
 import { Session } from "next-auth";
-import OddsSkeleton from "./OddsSkeleton";
-import { OddData } from "@/data/Odd";
-import OddsList from "./Odds/OddsList";
+import SportsFilter from "@/features/odds/components/SportsFilter";
+import OddsList from "@/features/odds/components/OddsList";
+import { useOddsHomeViewModel } from "@/features/odds/hooks/useOddsHomeViewModel";
+import DropdownAccordion from "./DropdownAccordion";
 import LoginButton from "./User/LoginButton";
+import UserPanel from "./User/UserPanel";
+import OddsSkeleton from "./OddsSkeleton";
+import { Odd } from "@/data/Odd";
 
-export default function ClientHomePage({ session }: { session: Session | null }) {
-  const [loading, setLoading] = useState(true);
-  const [odds, setOdds] = useState<OddData[]>([]);
+interface ClientHomePageProps {
+  initialOdds: Odd[];
+  session: Session | null;
+  serverRenderedTimestamp: number;
+  errorMessage?: string | null;
+}
 
-  const {
-    selectedSport,
-    favoriteSports,
-    toggleFavoriteSport,
-    allSports,
-  } = useOddsContext();
-
-  useEffect(() => {
-    async function loadOdds() {
-      try {
-        const fetchedOdds = await fetchOddsData();
-        if (Array.isArray(fetchedOdds)) {
-          setOdds(fetchedOdds);
-        } else {
-          console.error("fetchOddsData retornou dados em formato inesperado:", fetchedOdds);
-          setOdds([]);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar odds:", error);
-        setOdds([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadOdds();
-  }, []);
+function ClientHomePage({ initialOdds, session, serverRenderedTimestamp, errorMessage }: ClientHomePageProps) {
+  const { liveGames, futureGames, finishedGames, loading, favoriteSports, toggleFavoriteSport } = useOddsHomeViewModel({
+    initialOdds,
+    serverRenderedTimestamp,
+  });
 
   if (loading) {
-    return <OddsSkeleton />;
+    return <OddsSkeleton count={5} />;
   }
 
-  const selectedGroup = allSports.find((g) => g.group === selectedSport);
-  const selectedKeys: string[] = selectedGroup ? selectedGroup.keys : [];
-
-  const filteredOdds = selectedKeys.length > 0
-    ? odds.filter((odd) => selectedKeys.includes(odd.sport_key))
-    : odds;
-
-  const now = Date.now();
-
-  const liveGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime();
-    return !isNaN(start) && start <= now && now <= start + 3 * 60 * 60 * 1000;
-  });
-
-  const futureGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime();
-    return !isNaN(start) && start > now;
-  });
-
-  const finishedGames = filteredOdds.filter((odd) => {
-    const start = new Date(odd.commence_time).getTime();
-    return !isNaN(start) && start + 3 * 60 * 60 * 1000 < now;
-  });
-
-  function sortByCommenceTimeAsc(games: OddData[]): OddData[] {
-    return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime();
-      const timeB = new Date(b.commence_time).getTime();
-      return (isNaN(timeA) ? 1 : timeA) - (isNaN(timeB) ? 1 : timeB);
-    });
+  if (errorMessage) {
+    return (
+      <main className="p-6 max-w-5xl mx-auto flex flex-col items-center justify-center h-[calc(100vh-100px)]">
+        <h1 className="text-3xl font-bold mb-4 text-red-600">Erro ao carregar dados!</h1>
+        <p className="mb-2 text-gray-700 text-center text-lg">{errorMessage}</p>
+        <p className="text-gray-500 text-sm mt-4">Por favor, tente novamente mais tarde.</p>
+      </main>
+    );
   }
-
-  function sortByCommenceTimeDesc(games: OddData[]): OddData[] {
-    return [...games].sort((a, b) => {
-      const timeA = new Date(a.commence_time).getTime();
-      const timeB = new Date(b.commence_time).getTime();
-      return (isNaN(timeB) ? 1 : timeB) - (isNaN(timeA) ? 1 : timeA);
-    });
-  }
-
-  const sortedLiveGames = sortByCommenceTimeAsc(liveGames);
-  const sortedFutureGames = sortByCommenceTimeAsc(futureGames);
-  const sortedFinishedGames = sortByCommenceTimeDesc(finishedGames);
 
   return (
-    <main className="p-6 max-w-5xl mx-auto">
-      {session ? (
-        <UserPanel session={session} />
-      ) : (
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">Bem-vindo à Anagaming!</h1>
-          <p className="mb-2 text-gray-700">Explore as odds ao vivo abaixo. Faça login para acessar recursos como favoritos.</p>
-          <LoginButton />
+    // Container principal da página com max-width e centralização
+    <main className="container mx-auto p-4 md:p-6 lg:p-8 max-w-screen-xl">
+      {/* Mensagem de erro */}
+      {errorMessage && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 shadow-md"
+          role="alert"
+        >
+          <strong className="font-bold">Erro:</strong>
+          <span className="block sm:inline ml-2">{errorMessage}</span>
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Apostas ao Vivo</h2>
+      {/* Painel do Usuário (UserPanel) - já está bem encapsulado */}
+      <UserPanel session={session}>
+        {session ? (
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">Bem-vindo à Anagaming!</h1>
+            <p className="text-lg text-gray-700">Explore e gerencie suas apostas.</p>
+          </div>
+        ) : (
+          <div className="text-center mb-8">
+            <p className="mb-4 text-gray-700 text-lg">
+              Explore as odds ao vivo abaixo. Faça login para acessar recursos como favoritos.
+            </p>
+            <LoginButton />
+          </div>
+        )}
+      </UserPanel>
+
+      {/* Seção de Título e Botão de Limpar Favoritos */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 mt-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Apostas ao Vivo</h2>
         {session && favoriteSports.length > 0 && (
           <button
-            onClick={() => {
-              favoriteSports.forEach((sport) => toggleFavoriteSport(sport));
-            }}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
+            onClick={() => favoriteSports.forEach((sport) => toggleFavoriteSport(sport))}
+            className="px-6 py-2 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white rounded-full font-semibold shadow-md transition-all duration-200 ease-in-out"
             aria-label="Limpar categorias favoritas"
           >
             Limpar categorias favoritas
@@ -118,35 +83,40 @@ export default function ClientHomePage({ session }: { session: Session | null })
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        <SportsFilter />
+      {/* Filtros */}
+      <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <SportsFilter /> {/* Presumindo que SportsFilter lida com seu próprio estilo interno */}
       </div>
 
-      <DropdownAccordion
-        title={<span>Jogos Ao Vivo</span>}
-        defaultOpen
-        count={sortedLiveGames.length}
-        status="live"
-      >
-        <OddsList odds={sortedLiveGames} />
-      </DropdownAccordion>
-
-      <DropdownAccordion
-        title={<span>Jogos Futuros</span>}
-        defaultOpen
-        count={sortedFutureGames.length}
-        status="future"
-      >
-        <OddsList odds={sortedFutureGames} />
-      </DropdownAccordion>
-
-      <DropdownAccordion
-        title={<span>Jogos Encerrados</span>}
-        count={sortedFinishedGames.length}
-        status="finished"
-      >
-        <OddsList odds={sortedFinishedGames} />
-      </DropdownAccordion>
+      {/* DropdownAccordions para categorias de jogos */}
+      <section className="space-y-4">
+        {" "}
+        {/* Adiciona espaçamento entre os acordeões */}
+        <DropdownAccordion
+          title={<span className="text-xl font-semibold">Jogos Ao Vivo</span>}
+          defaultOpen
+          count={liveGames.length}
+          status="live"
+        >
+          <OddsList odds={liveGames} />
+        </DropdownAccordion>
+        <DropdownAccordion
+          title={<span className="text-xl font-semibold">Jogos Futuros</span>}
+          defaultOpen
+          count={futureGames.length}
+          status="future"
+        >
+          <OddsList odds={futureGames} />
+        </DropdownAccordion>
+        <DropdownAccordion
+          title={<span className="text-xl font-semibold">Jogos Encerrados</span>}
+          count={finishedGames.length}
+          status="finished"
+        >
+          <OddsList odds={finishedGames} />
+        </DropdownAccordion>
+      </section>
     </main>
   );
 }
+export default ClientHomePage;

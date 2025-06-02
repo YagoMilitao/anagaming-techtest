@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { signIn } from 'next-auth/react'
+import { signIn } from "next-auth/react";
 
 export default function LoginButton() {
   return (
@@ -10,5 +10,5 @@ export default function LoginButton() {
     >
       Entrar com GitHub
     </button>
-  )
+  );
 }

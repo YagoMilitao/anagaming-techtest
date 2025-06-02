@@ -1,0 +1,99 @@
+// src/features/odds/details/OddsDetailPageContent.tsx
+// Este é um componente reutilizável que exibe os detalhes de uma odd.
+// Ele não é um Server Component de rota diretamente.
+
+"use client"; // Pode ser um Client Component se precisar de interatividade, ou um Server Component "puro" se não tiver estados/efeitos.
+// Neste caso, se for só display, pode ser um Server Component sem 'use client'.
+// Vamos deixá-lo sem 'use client' por enquanto para ser renderizado no servidor se possível.
+
+import { FaCalendarAlt, FaClock } from "react-icons/fa";
+import { Odd } from "@/data/Odd";
+import { formatDate } from "@/utils/formatDate";
+import { getSportIcon } from "@/utils/sportIconDictionary";
+import { getSportName } from "@/utils/sportNameDictionary";
+
+interface OddsDetailPageContentProps {
+  odd: Odd | null;
+  error?: string | null;
+}
+
+export default function OddsDetailPageContent({ odd, error }: OddsDetailPageContentProps) {
+  if (error || !odd) {
+    let displayMessage = error || "Odd não encontrada.";
+    if (error === "QUOTA_EXCEEDED") {
+      displayMessage =
+        "Cota da API excedida. Não foi possível carregar os detalhes desta partida. Tente novamente mais tarde.";
+    } else if (error === "API_KEY_MISSING") {
+      displayMessage = "Erro interno do servidor: chave da API ausente.";
+    } else if (error === "INVALID_DATA_FORMAT") {
+      displayMessage = "Erro ao processar os dados dos detalhes da partida.";
+    }
+
+    return <div className="p-6 text-center text-gray-700 text-xl">{displayMessage}</div>;
+  }
+
+  // Validação mais rigorosa dos dados antes de usar
+  if (
+    typeof odd.home_team !== "string" ||
+    typeof odd.away_team !== "string" ||
+    typeof odd.commence_time !== "string" ||
+    !Array.isArray(odd.bookmakers)
+  ) {
+    console.error("OddsDetailPageContent: Dados da odd incompletos ou inválidos.", odd);
+    return (
+      <div className="p-6 text-center text-red-600 text-xl">
+        Erro: Dados da odd incompletos ou inválidos para exibição.
+      </div>
+    );
+  }
+
+  const commenceDate = new Date(odd.commence_time);
+  const formattedDate = isNaN(commenceDate.getTime()) ? "Data Inválida" : formatDate(odd.commence_time); // Usando date-fns
+  const formattedTime = isNaN(commenceDate.getTime()) ? "Hora Inválida" : formatDate(odd.commence_time); // Usando date-fns
+
+  const SportIcon = getSportIcon(odd.sport_key);
+  return (
+    <main className="p-6 max-w-5xl mx-auto">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-2xl font-bold mb-4">{odd.league_name}</h1>
+        <h2 className="text-2xl font-bold mb-4">
+          {odd.home_team} vs {odd.away_team}
+        </h2>
+
+        <div className="flex items-center text-gray-600 mb-2">
+          {SportIcon && <SportIcon className="mr-2" />}
+          {getSportName(odd.sport_key)}
+        </div>
+        <div className="flex items-center text-gray-600 mb-2">
+          <FaCalendarAlt className="mr-2" />
+          <span>{formattedDate}</span>
+        </div>
+        <div className="flex items-center text-gray-600 mb-4">
+          <FaClock className="mr-2" />
+          <span>{formattedTime}</span>
+        </div>
+
+        <h2 className="text-xl font-semibold mb-2">Odds</h2>
+        {odd.bookmakers.map((bookmaker) => (
+          <div key={bookmaker.key} className="mb-4 border p-4 rounded-md">
+            <h3 className="text-lg font-medium mb-2">{bookmaker.title}</h3>
+            {bookmaker.markets?.map((market, index) => (
+              <div key={market.key || index} className="flex flex-wrap gap-4 mt-2">
+                {market.outcomes?.map((outcome, idx) => (
+                  <div key={outcome.name || idx} className="bg-gray-100 p-2 rounded-md border border-gray-200">
+                    <span className="block font-medium text-gray-800">{outcome.name || "Nome Desconhecido"}</span>
+                    <span className="text-blue-600 font-bold">
+                      {typeof outcome.price === "number"
+                        ? outcome.price.toFixed(2)
+                        : (parseFloat(String(outcome.price)) || 0).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </main>
+  );
+}

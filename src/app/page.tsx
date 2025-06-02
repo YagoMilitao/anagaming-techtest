@@ -1,15 +1,55 @@
-import React from "react";
-import { getServerSession } from "next-auth";
-import ClientHomePage from "./components/ClientHomePage";
-import { FilterProvider } from "./context/FilterContext";
-import { authOptions } from "@/lib/authOptions";
+import { fetchOddsData } from "@/app/lib/fetchOdds";
+import ClientHomePage from "@/app/components/ClientHomePage";
+import { Session } from "next-auth";
+import { getServerSession } from "next-auth/next";
+import { Odd } from "@/data/Odd";
+import { authOptions } from "@/app/lib/authOptions";
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
+  const session: Session | null = await getServerSession(authOptions);
+
+  let initialOdds: Odd[] = [];
+  let displayErrorMessage: string | null = null; // Mensagem para o usuário na tela
+
+  // Chama a função de busca de dados que já trata a quota
+  const fetchResult = await fetchOddsData();
+
+  if (fetchResult.error) {
+    // Atribui a mensagem de erro específica para exibição na UI
+    switch (fetchResult.error) {
+      case "QUOTA_EXCEEDED":
+        displayErrorMessage =
+          "Parece que excedemos nossa cota de uso da API de odds. Os dados podem não estar atualizados ou disponíveis no momento. Por favor, tente novamente mais tarde ou entre em contato com o suporte.";
+        break;
+      case "API_KEY_MISSING":
+        displayErrorMessage =
+          "Erro interno: A chave da API de odds não está configurada corretamente. Favor contatar o administrador.";
+        break;
+      case "INVALID_DATA_FORMAT":
+        displayErrorMessage = "Ocorreu um problema ao processar os dados das apostas. Tente novamente.";
+        break;
+      case "UNKNOWN_ERROR":
+      default:
+        displayErrorMessage =
+          "Não foi possível carregar os dados das apostas. Verifique sua conexão com a internet ou tente novamente mais tarde.";
+        break;
+    }
+    initialOdds = []; // Garante que não passamos dados incompletos ou errados
+  } else {
+    initialOdds = fetchResult.data;
+  }
+
+  // Caso não haja erro, mas a lista de odds esteja vazia (API não retornou jogos)
+  if (initialOdds.length === 0 && !displayErrorMessage) {
+    displayErrorMessage = "Nenhum evento de aposta disponível no momento. Volte mais tarde!";
+  }
 
   return (
-    <FilterProvider>
-      <ClientHomePage session={session} />
-    </FilterProvider>
-  )
+    <ClientHomePage
+      initialOdds={initialOdds}
+      session={session}
+      serverRenderedTimestamp={Date.now()}
+      errorMessage={displayErrorMessage} // Passa a mensagem de erro para o Client Component
+    />
+  );
 }
