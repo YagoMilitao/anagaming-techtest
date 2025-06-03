@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { FilterProvider, useFilter } from "../../features/odds/context/FilterContext";
+import { FilterProvider, useFilter } from "../../../../../features/odds/context/FilterContext";
 
 const TestComponent = () => {
   const { selectedSport, setSelectedSport, selectedLeague, setSelectedLeague } = useFilter();

@@ -13,6 +13,7 @@ export interface Bookmaker {
   key: string;
   title: string;
   markets: Market[];
+  last_update: string;
 }
 export interface Odd {
   id: string;
@@ -28,6 +29,7 @@ export interface Odd {
   league_name?: string;
 }
 export interface SportGroup {
+  key: string;
   group: string;
   keys: string[];
 }

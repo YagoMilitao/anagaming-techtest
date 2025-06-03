@@ -1,4 +1,4 @@
-// src/app/layout.tsx
+
 import "./globals.css";
 import Link from "next/link";
 import { OddsProvider } from "@/features/odds/context/OddsContext";
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "Anagaming",
     images: [
       {
-        url: "https://anagaming-techtest.vercel.app/images/logo.jpg", // Crie esta imagem (ex: 1200x630px) na pasta public/images/
+        url: "https://anagaming-techtest.vercel.app/images/logo.jpg",
         width: 1200,
         height: 630,
         alt: "Anagaming - Melhores Odds Esportivas",

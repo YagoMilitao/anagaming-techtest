@@ -1,6 +1,6 @@
 import React from "react";
 import { render, act } from "@testing-library/react";
-import { OddsProvider, useOddsContext } from "../../features/odds/context/OddsContext";
+import { OddsProvider, useOddsContext } from "../../../../../features/odds/context/OddsContext";
 
 const TestComponent = () => {
   const { favoriteSports, toggleFavoriteSport } = useOddsContext();
