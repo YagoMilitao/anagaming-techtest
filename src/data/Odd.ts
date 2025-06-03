@@ -1,7 +1,6 @@
 export interface Outcome {
   name: string;
-  price: number;
-  point?: number;
+  price: number | string;
 }
 
 export interface Market {
@@ -12,9 +11,10 @@ export interface Market {
 export interface Bookmaker {
   key: string;
   title: string;
-  markets: Market[];
   last_update: string;
+  markets: Market[];
 }
+
 export interface Odd {
   id: string;
   sport_key: string;
@@ -23,15 +23,9 @@ export interface Odd {
   home_team: string;
   away_team: string;
   bookmakers: Bookmaker[];
-  eventId?: string;
-  sport?: string;
-  status?: "live" | "future" | "finished" | string;
   league_name?: string;
-}
-export interface SportGroup {
-  key: string;
-  group: string;
-  keys: string[];
+  status?: string;
+  last_update?: string;
 }
 
 export interface Sport {
@@ -40,5 +34,10 @@ export interface Sport {
   title: string;
   description: string;
   active: boolean;
-  has_outrights: boolean;
+  has_odds: boolean;
+}
+
+export interface SportGroup {
+  group: string;
+  keys: string[];
 }

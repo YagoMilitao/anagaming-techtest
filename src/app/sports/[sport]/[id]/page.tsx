@@ -8,7 +8,9 @@ interface PageParams {
   id: string;
 }
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateMetadata({ params }: any): Promise<Metadata> {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { id, sport } = params as PageParams;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: odd, error } = await fetchOddById(sport, id);

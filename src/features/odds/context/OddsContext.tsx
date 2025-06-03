@@ -1,21 +1,16 @@
 "use client";
 
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { SportGroup } from "@/data/Odd";
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 
-type OddsContextType = {
-  selectedChampionship: string;
-  setSelectedChampionship: (championship: string) => void;
+interface OddsContextType {
   selectedSport: string;
   setSelectedSport: (sport: string) => void;
-  applySportFilter: (sport: string) => void;
-  applyChampionshipFilter: (championship: string) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
   favoriteSports: string[];
-  toggleFavoriteSport: (sport: string) => void;
+  toggleFavoriteSport: (sportKey: string) => void;
   allSports: SportGroup[];
-};
+  setAllSports: (sports: SportGroup[]) => void;
+}
 
 const OddsContext = createContext<OddsContextType | undefined>(undefined);
 
@@ -24,69 +19,53 @@ interface OddsProviderProps {
   initialSports: SportGroup[];
 }
 
-export const OddsProvider = ({ children, initialSports }: OddsProviderProps) => {
-  const [sortBy, setSortBy] = useState("");
-  const [selectedSport, setSelectedSport] = useState("");
-  const [selectedChampionship, setSelectedChampionship] = useState("");
-  const [allSports] = useState<SportGroup[]>(initialSports);
-  const [favoriteSports, setFavoriteSports] = useState<string[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("favoriteSports");
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        console.error("Failed to parse favoriteSports from localStorage.");
-        return [];
-      }
-    }
-    return [];
-  });
+export function OddsProvider({ children, initialSports }: OddsProviderProps) {
+  const [selectedSport, setSelectedSport] = useState<string>("all");
+  const [favoriteSports, setFavoriteSports] = useState<string[]>([]);
+  const [allSports, setAllSports] = useState<SportGroup[]>(initialSports);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("favoriteSports", JSON.stringify(favoriteSports));
+    const storedFavorites = localStorage.getItem("favoriteSports");
+    if (storedFavorites) {
+      try {
+        setFavoriteSports(JSON.parse(storedFavorites));
+      } catch (e) {
+        console.error("Falha ao analisar esportes favoritos do localStorage", e);
+        setFavoriteSports([]);
+      }
     }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("favoriteSports", JSON.stringify(favoriteSports));
   }, [favoriteSports]);
 
-  const toggleFavoriteSport = useCallback((sport: string) => {
-    setFavoriteSports((prev) => (prev.includes(sport) ? prev.filter((s) => s !== sport) : [...prev, sport]));
-  }, []);
+  const toggleFavoriteSport = (sportKey: string) => {
+    setFavoriteSports((prevFavorites) => {
+      if (prevFavorites.includes(sportKey)) {
+        return prevFavorites.filter((key) => key !== sportKey);
+      } else {
+        return [...prevFavorites, sportKey];
+      }
+    });
+  };
 
-  const applySportFilter = useCallback((sport: string) => {
-    setSelectedSport(sport);
-    setSelectedChampionship("");
-  }, []);
+  const value = {
+    selectedSport,
+    setSelectedSport,
+    favoriteSports,
+    toggleFavoriteSport,
+    allSports,
+    setAllSports,
+  };
 
-  const applyChampionshipFilter = useCallback((championship: string) => {
-    setSelectedChampionship(championship);
-    setSelectedSport("");
-  }, []);
+  return <OddsContext.Provider value={value}>{children}</OddsContext.Provider>;
+}
 
-  return (
-    <OddsContext.Provider
-      value={{
-        selectedChampionship,
-        setSelectedChampionship,
-        selectedSport,
-        setSelectedSport,
-        applySportFilter,
-        applyChampionshipFilter,
-        sortBy,
-        setSortBy,
-        favoriteSports,
-        toggleFavoriteSport,
-        allSports,
-      }}
-    >
-      {children}
-    </OddsContext.Provider>
-  );
-};
-
-export const useOddsContext = () => {
+export function useOddsContext() {
   const context = useContext(OddsContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useOddsContext deve ser usado dentro de um OddsProvider");
   }
   return context;
-};
+}

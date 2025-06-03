@@ -22,6 +22,7 @@ export function OddDetailsDisplay({ odd }: OddDetailsDisplayProps) {
         </div>
         <div className="flex items-center text-gray-600 mb-2">
           <FaCalendarAlt className="mr-2" />
+          {/* toLocaleDateString() e toLocaleTimeString() são dependentes do locale do navegador/ambiente */}
           <span>{new Date(odd.commence_time).toLocaleDateString()}</span>
         </div>
         <div className="flex items-center text-gray-600 mb-4">
@@ -44,6 +45,7 @@ export function OddDetailsDisplay({ odd }: OddDetailsDisplayProps) {
                     >
                       <span className="block font-medium text-gray-800">{outcome.name}</span>
                       <span className="text-blue-600 text-lg font-bold">
+                        {/* Garante que o preço é formatado com duas casas decimais */}
                         {typeof outcome.price === "number"
                           ? outcome.price.toFixed(2)
                           : Number(outcome.price).toFixed(2)}

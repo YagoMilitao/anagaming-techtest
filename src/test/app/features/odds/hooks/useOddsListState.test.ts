@@ -1,14 +1,13 @@
-import { useOddsListState } from '@/features/hooks/oddsListState';
-import { renderHook, act } from '@testing-library/react';
-import { useRouter } from 'next/navigation'; // Hook a ser mockado
-
+import { useOddsListState } from "@/features/hooks/oddsListState";
+import { renderHook, act } from "@testing-library/react";
+import { useRouter } from "next/navigation"; // Hook a ser mockado
 
 // Mock do useRouter de next/navigation
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 
-describe('useOddsListState', () => {
+describe("useOddsListState", () => {
   const mockPush = jest.fn(); // Mock da função push do router
 
   beforeEach(() => {
@@ -23,18 +22,18 @@ describe('useOddsListState', () => {
     });
   });
 
-  it('should return navigateToDetails function', () => {
+  it("should return navigateToDetails function", () => {
     const { result } = renderHook(() => useOddsListState());
 
     // Verifica se a função navigateToDetails é retornada pelo hook
-    expect(typeof result.current.navigateToDetails).toBe('function');
+    expect(typeof result.current.navigateToDetails).toBe("function");
   });
 
-  it('should call router.push with the correct URL when navigateToDetails is called', () => {
+  it("should call router.push with the correct URL when navigateToDetails is called", () => {
     const { result } = renderHook(() => useOddsListState());
 
-    const sportKey = 'soccer_epl';
-    const id = 'match-123';
+    const sportKey = "soccer_epl";
+    const id = "match-123";
     const expectedUrl = `/sports/${sportKey}/${id}`; // A URL esperada
 
     // Chama a função navigateToDetails

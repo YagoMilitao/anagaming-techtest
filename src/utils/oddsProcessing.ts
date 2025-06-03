@@ -1,89 +1,59 @@
 import { Odd } from "@/data/Odd";
-import _ from "lodash";
 
 /**
- * Filtra uma lista de odds com base nas chaves de esporte selecionadas.
- * Se nenhuma chave for selecionada, retorna a lista original.
- * @param odds A lista completa de odds.
- * @param selectedSportKeys As chaves dos esportes pelos quais filtrar.
- * @returns Uma nova lista de odds filtradas.
+ * Filtra uma lista de odds por um array de chaves de esporte.
+ * Se o array sportKeys estiver vazio, todas as odds são retornadas.
  */
-export function filterOddsBySportKeys(odds: Odd[], selectedSportKeys: string[]): Odd[] {
-  if (!selectedSportKeys || selectedSportKeys.length === 0) {
+export function filterOddsBySportKeys(odds: Odd[], sportKeys: string[]): Odd[] {
+  // 'all' é uma chave especial que indica para não aplicar filtro de esporte
+  if (sportKeys.length === 0 || sportKeys.includes("all")) {
     return odds;
   }
-  return _.filter(odds, (odd) => _.includes(selectedSportKeys, odd.sport_key));
+  return odds.filter((odd) => sportKeys.includes(odd.sport_key));
 }
 
 /**
- * Classifica uma lista de odds em ordem crescente com base no tempo de início (commence_time).
- * Odds com tempos inválidos são colocadas no final. Inclui critério de desempate por ID.
- * @param games A lista de odds a ser classificada.
- * @returns Uma nova lista de odds classificadas.
+ * Categoriza as odds em jogos ao vivo, futuros e finalizados com base no tempo atual.
+ * @param odds O array de objetos Odd para categorizar.
+ * @param currentTime O timestamp atual em milissegundos.
  */
-export function sortOddsByCommenceTimeAsc(games: Odd[]): Odd[] {
-  return [...games].sort((a, b) => {
-    const timeA = new Date(a.commence_time).getTime();
-    const timeB = new Date(b.commence_time).getTime();
+export function categorizeOddsByTime(odds: Odd[], currentTime: number) {
+  const liveGames: Odd[] = [];
+  const futureGames: Odd[] = [];
+  const finishedGames: Odd[] = [];
 
-    if (isNaN(timeA) && isNaN(timeB)) return 0;
-    if (isNaN(timeA)) return 1;
-    if (isNaN(timeB)) return -1;
-    if (timeA === timeB) {
-      return a.id.localeCompare(b.id);
-    }
-    return timeA - timeB;
-  });
-}
+  odds.forEach((odd) => {
+    const commenceTime = new Date(odd.commence_time).getTime(); // Converte string ISO para timestamp
 
-/**
- * Classifica uma lista de odds em ordem decrescente com base no tempo de início (commence_time).
- * Odds com tempos inválidos são colocadas no final. Inclui critério de desempate por ID.
- * @param games A lista de odds a ser classificada.
- * @returns Uma nova lista de odds classificadas.
- */
-export function sortOddsByCommenceTimeDesc(games: Odd[]): Odd[] {
-  return [...games].sort((a, b) => {
-    const timeA = new Date(a.commence_time).getTime();
-    const timeB = new Date(b.commence_time).getTime();
+    // Aqui usamos uma heurística simples para "ao vivo":
+    // iniciado mas não há muito tempo.
+    // Uma implementação mais robusta de "ao vivo" viria da própria API.
+    const fiveHoursAgo = currentTime - 5 * 60 * 60 * 1000; // 5 horas em milissegundos
 
-    if (isNaN(timeA) && isNaN(timeB)) return 0;
-    if (isNaN(timeA)) return 1;
-    if (isNaN(timeB)) return -1;
-    if (timeA === timeB) {
-      return a.id.localeCompare(b.id);
-    }
-    return timeB - timeA;
-  });
-}
-
-/**
- * Categoriza uma lista de odds em "ao vivo", "futuros" e "encerrados"
- * com base no tempo atual e um período de jogo assumido (3 horas).
- * @param odds A lista de odds a ser categorizada.
- * @param currentTime O timestamp de referência (Date.now()).
- * @param gameDurationMs A duração estimada de um jogo em milissegundos (padrão: 3 horas).
- * @returns Um objeto contendo listas de odds para cada categoria.
- */
-export function categorizeOddsByTime(odds: Odd[], currentTime: number, gameDurationMs: number = 3 * 60 * 60 * 1000) {
-  const groupedOdds = _.groupBy(odds, (odd) => {
-    const commenceTime = new Date(odd.commence_time).getTime();
-    if (isNaN(commenceTime)) {
-      return "invalid";
-    }
-
-    if (commenceTime <= currentTime && currentTime <= commenceTime + gameDurationMs) {
-      return "live";
+    if (commenceTime <= currentTime && commenceTime > fiveHoursAgo) {
+      // Considerado "ao vivo" se começou nas últimas 5 horas
+      liveGames.push(odd);
     } else if (commenceTime > currentTime) {
-      return "future";
+      futureGames.push(odd);
     } else {
-      return "finished";
+      // Todos os outros jogos passados são considerados finalizados
+      finishedGames.push(odd);
     }
   });
 
-  return {
-    liveGames: (groupedOdds.live || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
-    futureGames: (groupedOdds.future || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
-    finishedGames: (groupedOdds.finished || []).filter((odd) => !isNaN(new Date(odd.commence_time).getTime())),
-  };
+  return { liveGames, futureGames, finishedGames };
+}
+
+/**
+ * Ordena as odds pela hora de início em ordem ascendente (o mais cedo primeiro).
+ */
+export function sortOddsByCommenceTimeAsc(odds: Odd[]): Odd[] {
+  return [...odds].sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
+}
+
+/**
+ * Ordena as odds pela hora de início em ordem descendente (o mais recente primeiro).
+ */
+export function sortOddsByCommenceTimeDesc(odds: Odd[]): Odd[] {
+  return [...odds].sort((a, b) => new Date(b.commence_time).getTime() - new Date(a.commence_time).getTime());
 }

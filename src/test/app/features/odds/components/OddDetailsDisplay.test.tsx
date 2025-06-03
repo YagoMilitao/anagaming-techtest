@@ -1,53 +1,53 @@
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { Odd } from '@/data/Odd';
-import { OddDetailsDisplay } from '@/features/odds/components/OddDetailsDisplay';
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { Odd } from "@/data/Odd";
+import { OddDetailsDisplay } from "@/features/odds/components/OddDetailsDisplay";
 
-describe('OddDetailsDisplay', () => {
+describe("OddDetailsDisplay", () => {
   const mockOdd: Odd = {
-    id: 'test-odd-1',
-    sport_key: 'soccer_epl',
-    sport_title: 'Futebol',
+    id: "test-odd-1",
+    sport_key: "soccer_epl",
+    sport_title: "Futebol",
     // Usar um timestamp para facilitar a consistência em testes
     // Esta data é 15 de junho de 2025, 15:30:00 UTC
-    commence_time: '2025-06-15T15:30:00Z',
-    home_team: 'Corinthians',
-    away_team: 'Palmeiras',
-    league_name: 'Campeonato Brasileiro',
+    commence_time: "2025-06-15T15:30:00Z",
+    home_team: "Corinthians",
+    away_team: "Palmeiras",
+    league_name: "Campeonato Brasileiro",
     bookmakers: [
       {
-        key: 'bet365',
-        title: 'Bet365',
-        last_update: '2025-06-15T15:20:00Z',
+        key: "bet365",
+        title: "Bet365",
+        last_update: "2025-06-15T15:20:00Z",
         markets: [
           {
-            key: 'h2h',
+            key: "h2h",
             outcomes: [
-              { name: 'Corinthians', price: 2.15 },
-              { name: 'Draw', price: 3.20 },
-              { name: 'Palmeiras', price: 3.50 },
+              { name: "Corinthians", price: 2.15 },
+              { name: "Draw", price: 3.2 },
+              { name: "Palmeiras", price: 3.5 },
             ],
           },
           {
-            key: 'totals',
+            key: "totals",
             outcomes: [
-              { name: 'Over 2.5', price: 1.80 },
-              { name: 'Under 2.5', price: 2.05 },
+              { name: "Over 2.5", price: 1.8 },
+              { name: "Under 2.5", price: 2.05 },
             ],
           },
         ],
       },
       {
-        key: 'betway',
-        title: 'Betway',
-        last_update: '2025-06-15T15:25:00Z',
+        key: "betway",
+        title: "Betway",
+        last_update: "2025-06-15T15:25:00Z",
         markets: [
           {
-            key: 'h2h',
+            key: "h2h",
             outcomes: [
-              { name: 'Corinthians', price: 2.10 },
-              { name: 'Draw', price: 3.30 },
-              { name: 'Palmeiras', price: 3.40 },
+              { name: "Corinthians", price: 2.1 },
+              { name: "Draw", price: 3.3 },
+              { name: "Palmeiras", price: 3.4 },
             ],
           },
         ],
@@ -62,23 +62,23 @@ describe('OddDetailsDisplay', () => {
   // ou usar uma biblioteca de formatação consistente para ambos (componente e teste).
   // =========================================================================
 
-  it('should display home and away team names', () => {
+  it("should display home and away team names", () => {
     render(<OddDetailsDisplay odd={mockOdd} />);
-    expect(screen.getByText('Corinthians vs Palmeiras')).toBeInTheDocument();
+    expect(screen.getByText("Corinthians vs Palmeiras")).toBeInTheDocument();
   });
 
-  it('should display sport title and league name', () => {
+  it("should display sport title and league name", () => {
     render(<OddDetailsDisplay odd={mockOdd} />);
-    expect(screen.getByText('Futebol - Campeonato Brasileiro')).toBeInTheDocument();
+    expect(screen.getByText("Futebol - Campeonato Brasileiro")).toBeInTheDocument();
   });
 
   it('should display "Nome Indisponivel" if league_name is not provided', () => {
     const oddWithoutLeague = { ...mockOdd, league_name: undefined };
     render(<OddDetailsDisplay odd={oddWithoutLeague} />);
-    expect(screen.getByText('Futebol - Nome Indisponivel')).toBeInTheDocument();
+    expect(screen.getByText("Futebol - Nome Indisponivel")).toBeInTheDocument();
   });
 
-  it('should display formatted commence date and time', () => {
+  it("should display formatted commence date and time", () => {
     // Para este teste, o mais seguro é definir um locale fixo para o ambiente de teste
     // ou simplesmente verificar que o formato esperado aparece.
     // O JSDOM (ambiente de teste do Jest) geralmente usa o locale padrão do Node.js,
@@ -137,22 +137,22 @@ describe('OddDetailsDisplay', () => {
     // que esperamos, mas sem ser super específico com o formato exato que muda com locale.
 
     // Vamos tentar com o formato que provavelmente se espera no seu ambiente (se for pt-BR)
-    expect(screen.getByText('15/06/2025')).toBeInTheDocument();
+    expect(screen.getByText("15/06/2025")).toBeInTheDocument();
     // A hora UTC 15:30:00Z é 12:30:00 no fuso horário -03:00 (Brasil)
-    expect(screen.getByText('12:30:00')).toBeInTheDocument(); // Ajustado para o fuso horário -03:00
+    expect(screen.getByText("12:30:00")).toBeInTheDocument(); // Ajustado para o fuso horário -03:00
   });
 
-  it('should display all bookmakers and their titles', () => {
+  it("should display all bookmakers and their titles", () => {
     render(<OddDetailsDisplay odd={mockOdd} />);
-    expect(screen.getByText('Bet365')).toBeInTheDocument();
-    expect(screen.getByText('Betway')).toBeInTheDocument();
+    expect(screen.getByText("Bet365")).toBeInTheDocument();
+    expect(screen.getByText("Betway")).toBeInTheDocument();
   });
 
-  it('should render the correct number of bookmakers, markets, and outcomes', () => {
+  it("should render the correct number of bookmakers, markets, and outcomes", () => {
     render(<OddDetailsDisplay odd={mockOdd} />);
 
     // Check number of bookmakers
-    const bookmakers = screen.getAllByRole('heading', { level: 3 }); // h3 for bookmaker titles
+    const bookmakers = screen.getAllByRole("heading", { level: 3 }); // h3 for bookmaker titles
     expect(bookmakers).toHaveLength(mockOdd.bookmakers.length);
 
     // Check number of markets (paragraphs with "Mercado: ")

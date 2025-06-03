@@ -3,8 +3,10 @@ import { Odd, SportGroup, Sport } from "@/data/Odd";
 function getApiKey(): string {
   const apiKey = process.env.ODDS_API_KEY;
   if (!apiKey) {
-    console.error("Environment variable ODDS_API_KEY is not defined.");
-    throw new Error("API Key for odds service is not configured. Please check your environment variables.");
+    console.error("Variável de ambiente ODDS_API_KEY não está definida.");
+    throw new Error(
+      "Chave da API para o serviço de odds não configurada. Por favor, verifique suas variáveis de ambiente.",
+    );
   }
   return apiKey;
 }
@@ -21,14 +23,14 @@ export async function getOddDetails(id: string): Promise<Odd | null> {
     if (!res.ok) {
       if (res.status === 404) return null;
       const errorText = await res.text();
-      console.error(`Error fetching odd details (${id}): ${res.status} - ${res.statusText} - ${errorText}`);
-      throw new Error(`Failed to fetch odd details for ID ${id}. Status: ${res.status}`);
+      console.error(`Erro ao buscar detalhes da odd (${id}): ${res.status} - ${res.statusText} - ${errorText}`);
+      throw new Error(`Falha ao buscar detalhes da odd para o ID ${id}. Status: ${res.status}`);
     }
 
     const data: Odd[] = await res.json();
     return data[0] || null;
   } catch (error) {
-    console.error(`Server-side error in getOddDetails for ID ${id}:`, error);
+    console.error(`Erro no lado do servidor em getOddDetails para o ID ${id}:`, error);
     throw error;
   }
 }
@@ -39,21 +41,20 @@ export async function getUpcomingOdds(): Promise<Odd[]> {
 
   try {
     const res = await fetch(url, { cache: "no-store" });
-
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Error fetching upcoming odds: ${res.status} - ${res.statusText} - ${errorText}`);
-      throw new Error(`Failed to fetch upcoming odds. Status: ${res.status}`);
+      console.error(`Erro ao buscar odds futuras: ${res.status} - ${res.statusText} - ${errorText}`);
+      throw new Error(`Falha ao buscar odds futuras. Status: ${res.status}`);
     }
 
     const data: Odd[] = await res.json();
     if (!Array.isArray(data)) {
-      console.error("getUpcomingOdds: API response is not an array of Odd.", data);
+      console.error("getUpcomingOdds: A resposta da API não é um array de Odd.", data);
       return [];
     }
     return data;
   } catch (error) {
-    console.error("Server-side error in getUpcomingOdds:", error);
+    console.error("Erro no lado do servidor em getUpcomingOdds:", error);
     throw error;
   }
 }
@@ -69,15 +70,15 @@ export async function fetchSpecificOddByEventId(sportKey: string, eventId: strin
       if (response.status === 404) return null;
       const errorText = await response.text();
       console.error(
-        `Error fetching event ${eventId} for sport ${sportKey}: ${response.status} - ${response.statusText} - ${errorText}`,
+        `Erro ao buscar evento ${eventId} para esporte ${sportKey}: ${response.status} - ${response.statusText} - ${errorText}`,
       );
-      throw new Error(`Failed to fetch specific odd for event ${eventId}. Status: ${response.status}`);
+      throw new Error(`Falha ao buscar odd específica para o evento ${eventId}. Status: ${response.status}`);
     }
 
     const data: Odd[] = await response.json();
     return data[0] || null;
   } catch (error) {
-    console.error(`Server-side error in fetchSpecificOddByEventId for event ${eventId}:`, error);
+    console.error(`Erro no lado do servidor em fetchSpecificOddByEventId para o evento ${eventId}:`, error);
     throw error;
   }
 }
@@ -93,23 +94,28 @@ export async function getSportGroups(): Promise<SportGroup[]> {
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Error fetching sport groups: ${res.status} - ${res.statusText} - ${errorText}`);
-      throw new Error(`Failed to fetch sport groups. Status: ${res.status}`);
+      console.error(`Erro ao buscar grupos de esporte: ${res.status} - ${res.statusText} - ${errorText}`);
+      throw new Error(`Falha ao buscar grupos de esporte. Status: ${res.status}`);
     }
-    const data: SportGroup[] = await res.json();
+
+    const data: Sport[] = await res.json();
+
     if (!Array.isArray(data)) {
-      console.error("getSportGroups: API response is not an array of SportGroup.", data);
+      console.error("getSportGroups: A resposta da API não é um array de Sport.", data);
       return [];
     }
+
     const grouped: { [group: string]: string[] } = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data.forEach((sport: any) => {
-      if (!grouped[sport.group]) grouped[sport.group] = [];
+    data.forEach((sport: Sport) => {
+      if (!grouped[sport.group]) {
+        grouped[sport.group] = [];
+      }
       grouped[sport.group].push(sport.key);
     });
+
     return Object.entries(grouped).map(([group, keys]) => ({ group, keys }));
   } catch (error) {
-    console.error("Server-side error in getSportGroups:", error);
+    console.error("Erro no lado do servidor em getSportGroups:", error);
     throw error;
   }
 }
@@ -123,17 +129,17 @@ export async function getAllSports(): Promise<Sport[]> {
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Error fetching all sports: ${res.status} - ${res.statusText} - ${errorText}`);
-      throw new Error(`Failed to fetch all sports. Status: ${res.status}`);
+      console.error(`Erro ao buscar todos os esportes: ${res.status} - ${res.statusText} - ${errorText}`);
+      throw new Error(`Falha ao buscar todos os esportes. Status: ${res.status}`);
     }
     const data: Sport[] = await res.json();
     if (!Array.isArray(data)) {
-      console.error("getAllSports: API response is not an array of Sport.", data);
+      console.error("getAllSports: A resposta da API não é um array de Sport.", data);
       return [];
     }
     return data;
   } catch (error) {
-    console.error("Server-side error in getAllSports:", error);
+    console.error("Erro no lado do servidor em getAllSports:", error);
     throw error;
   }
 }

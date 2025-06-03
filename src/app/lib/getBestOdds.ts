@@ -36,7 +36,7 @@ export function getBestOdds(bookmakers: Bookmaker[]): BestOutcomeDetail[] {
     if (bestOutcome) {
       bestOutcomes.push({
         name: bestOutcome.name,
-        price: bestOutcome.price,
+        price: Number(bestOutcome.price),
         bookmakerName: bestOutcome.bookmakerName,
       });
     }
